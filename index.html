@@ -1,0 +1,1521 @@
+<!doctype html>
+<html lang="es" data-theme="light" data-palette="clasico">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Fondo de Ahorro</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400..700&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+<style>
+/* ---------- Tokens (contrast checked for low vision: body text ≥ 7:1, secondary ≥ 7:1) ---------- */
+:root{
+  --scale:1;
+  --bg:#ffffff; --well:#f4f4f2; --ink:#111111; --ink-2:#3d3d3a; --line:rgba(17,17,17,.14); --line-strong:rgba(17,17,17,.32);
+  /* Colour-blind-safe palette (Okabe–Ito), darkened where needed for ≥3:1 on white */
+  --accent:#005a8c; --accent-ink:#ffffff; --focus:#b3009b;
+  --c-contrib:#0072b2; --c-interest:#00845f; --c-real:#c34d00; --c-neg:#b0201a;
+  --ipab:#0072b2; --sofipo:#a2507f; --fund:#8a6a00; --gov:#00845f; --none:#5f5f5a;
+  --warn:#7a4b00; --warn-well:#fff6e5;
+  color-scheme:light;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#121212; --well:#1e1e1d; --ink:#f4f4f1; --ink-2:#d0cec7; --line:rgba(255,255,255,.16); --line-strong:rgba(255,255,255,.36);
+    --accent:#7cc8f2; --accent-ink:#06263a; --focus:#ff8de8;
+    --c-contrib:#56b4e9; --c-interest:#2ec4a0; --c-real:#ff8a4c; --c-neg:#ff8a80;
+    --ipab:#56b4e9; --sofipo:#e7a0cb; --fund:#f0e442; --gov:#2ec4a0; --none:#b5b5b0;
+    --warn:#ffcf7a; --warn-well:#2a2214;
+    color-scheme:dark;
+  }
+}
+:root[data-theme="dark"]{
+    --bg:#121212; --well:#1e1e1d; --ink:#f4f4f1; --ink-2:#d0cec7; --line:rgba(255,255,255,.16); --line-strong:rgba(255,255,255,.36);
+    --accent:#7cc8f2; --accent-ink:#06263a; --focus:#ff8de8;
+    --c-contrib:#56b4e9; --c-interest:#2ec4a0; --c-real:#ff8a4c; --c-neg:#ff8a80;
+    --ipab:#56b4e9; --sofipo:#e7a0cb; --fund:#f0e442; --gov:#2ec4a0; --none:#b5b5b0;
+    --warn:#ffcf7a; --warn-well:#2a2214;
+    color-scheme:dark;
+}
+
+/* ---------- Colour palettes (JS always sets data-theme to light/dark, so these pairs are enough) ---------- */
+:root[data-palette="contraste"]{
+  --bg:#ffffff; --well:#f0f0f0; --ink:#000000; --ink-2:#1a1a1a; --line:rgba(0,0,0,.35); --line-strong:#000000;
+  --accent:#0000c8; --accent-ink:#ffffff; --focus:#c80078;
+  --c-contrib:#0000c8; --c-interest:#006b00; --c-real:#d40000; --c-neg:#a00000;
+  --ipab:#0000c8; --sofipo:#8b008b; --fund:#7a5200; --gov:#006b00; --none:#333333;
+  --warn:#6b3d00; --warn-well:#fff0cc;
+}
+:root[data-palette="contraste"][data-theme="dark"]{
+  --bg:#000000; --well:#141414; --ink:#ffffff; --ink-2:#f0f0f0; --line:rgba(255,255,255,.4); --line-strong:#ffffff;
+  --accent:#ffff00; --accent-ink:#000000; --focus:#ff7bff;
+  --c-contrib:#00e5ff; --c-interest:#7dff7d; --c-real:#ffb000; --c-neg:#ff6b6b;
+  --ipab:#00e5ff; --sofipo:#ff7bff; --fund:#ffff00; --gov:#7dff7d; --none:#cfcfcf;
+  --warn:#ffd24d; --warn-well:#2b2200;
+}
+:root[data-palette="clasico"]{
+  --accent:#0b5c4a; --accent-ink:#ffffff; --focus:#1d4ed8;
+  --c-contrib:#5b6178; --c-interest:#0b7a5f; --c-real:#b4500f; --c-neg:#a3261d;
+  --ipab:#1f4f9a; --sofipo:#6a3fa8; --fund:#7a5a00; --gov:#0b7a5f; --none:#555550;
+}
+:root[data-palette="clasico"][data-theme="dark"]{
+  --accent:#5fd3ae; --accent-ink:#0b1f19; --focus:#8ab4ff;
+  --c-contrib:#a9aec4; --c-interest:#5fd3ae; --c-real:#ffae6b; --c-neg:#ff8a80;
+  --ipab:#8db4ff; --sofipo:#c9a6ff; --fund:#f0c75e; --gov:#5fd3ae; --none:#bdbab2;
+}
+:root[data-palette="calido"]{
+  --accent:#8a2c0d; --accent-ink:#ffffff; --focus:#1d4ed8;
+  --c-contrib:#3d5a80; --c-interest:#9c4a00; --c-real:#7b1fa2; --c-neg:#b0201a;
+  --ipab:#3d5a80; --sofipo:#9c2f6b; --fund:#7a5a00; --gov:#2e6b30; --none:#5f5f5a;
+}
+:root[data-palette="calido"][data-theme="dark"]{
+  --accent:#ffb38a; --accent-ink:#2a1004; --focus:#8ab4ff;
+  --c-contrib:#98c1d9; --c-interest:#f4a259; --c-real:#d9a7ff; --c-neg:#ff8a80;
+  --ipab:#98c1d9; --sofipo:#f28fbf; --fund:#f0c75e; --gov:#8fd694; --none:#bdbab2;
+}
+
+/* ---------- Base: everything in rem so the A−/A+ controls scale the whole page ---------- */
+html{font-size:calc(112.5% * var(--scale))} /* 18px base */
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:Inter,system-ui,sans-serif;font-optical-sizing:auto;
+  font-feature-settings:"cv11","ss01","tnum";line-height:1.6;-webkit-font-smoothing:antialiased;overflow-wrap:break-word}
+ul.src i{word-break:break-all}
+table{overflow-wrap:normal}
+.wrap{max-width:72rem;margin:0 auto;padding:2.5rem 1rem 8rem}
+@media (min-width:640px){.wrap{padding-left:1.5rem;padding-right:1.5rem}}
+h1,h2,h3{text-wrap:balance;font-weight:600;margin:0}
+h1{font-size:2.1rem;letter-spacing:-.02em;line-height:1.15}
+h2{font-size:1.4rem;letter-spacing:-.01em;line-height:1.25}
+h3{font-size:1.05rem;line-height:1.35}
+p{text-wrap:pretty;margin:.4rem 0 0}
+.lead{color:var(--ink-2);font-size:1.05rem;max-width:62ch}
+.muted{color:var(--ink-2)}
+.small{font-size:.9rem}
+.eyebrow{font-size:.9rem;font-weight:600;color:var(--accent)}
+/* ---------- Hero: title, lead and the result for the current assumptions ---------- */
+.page-hero{position:relative;overflow:hidden;border-radius:1.25rem;padding:clamp(1.25rem,4vw,2.75rem);
+  background:var(--well);background:linear-gradient(135deg,color-mix(in srgb,var(--accent) 11%,var(--bg)) 0%,var(--well) 70%);
+  box-shadow:inset 0 0 0 1px var(--line)}
+.page-hero::before{content:"";position:absolute;inset:0 0 auto 0;height:.4rem;background:var(--accent)}
+.page-hero h1{font-size:clamp(2.1rem,5.5vw,3.1rem);margin-top:.35rem}
+.page-hero .lead{font-size:1.15rem;margin-top:.6rem}
+.hero-result{margin-top:1.75rem;padding-top:1.5rem;border-top:1px solid var(--line-strong)}
+.hero-h{font-size:1.15rem}
+.hero-result .stats-c{margin-top:1rem}
+.hero-result #recon{margin-top:1rem}
+.hero-actions{margin-top:1.5rem;padding-top:1.25rem;border-top:1px solid var(--line)}
+.hero-actions .hint{flex-basis:100%}
+/* ---------- Compact result bar: slides in at the top after scrolling past the hero indicators ---------- */
+.kpi-bar{position:fixed;inset:0 0 auto 0;z-index:9;background:var(--bg);cursor:pointer;
+  box-shadow:0 1px 0 var(--line-strong),0 6px 18px rgba(0,0,0,.12);
+  transform:translateY(-110%);visibility:hidden;transition:transform .25s ease,visibility 0s linear .25s}
+.kpi-bar.show{transform:none;visibility:visible;transition:transform .25s ease,visibility 0s}
+.kpi-bar::before{content:"";position:absolute;inset:0 0 auto 0;height:.25rem;background:var(--accent)}
+.kpi-bar-in{max-width:72rem;margin:0 auto;padding:.55rem 1rem .45rem;container-type:inline-size}
+@media (min-width:640px){.kpi-bar-in{padding-left:1.5rem;padding-right:1.5rem}}
+.kpi-bar dl{display:grid;grid-template-columns:minmax(0,1fr);margin:0}
+.kpi-bar dl > div{min-width:0;padding:0 .9rem;border-left:1px solid var(--line)}
+.kpi-bar dl > div:first-child{padding-left:0;border-left:0}
+.kpi-bar dl > div:nth-child(n+2){display:none}
+.kpi-bar dt{font-size:.75rem;font-weight:600;color:var(--ink-2);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.kpi-bar dd{margin:0;font-size:min(1.2rem,12cqi);font-weight:700;letter-spacing:-.01em;line-height:1.25;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.kpi-bar .hero dd{color:var(--accent)}
+/* More indicators only when the numbers fit whole. rem here follows the A−/A+ text size,
+   so with large text the bar keeps fewer, bigger numbers instead of cutting them off. */
+@container (min-width:17rem){.kpi-bar dl{grid-template-columns:repeat(2,minmax(0,1fr))} .kpi-bar dl > div:nth-child(2){display:block} .kpi-bar dd{font-size:min(1.2rem,6.2cqi)}}
+@container (min-width:34rem){.kpi-bar dl{grid-template-columns:repeat(3,minmax(0,1fr))} .kpi-bar dl > div:nth-child(3){display:block} .kpi-bar dd{font-size:min(1.2rem,4.1cqi)}}
+@container (min-width:56rem){.kpi-bar dl{grid-template-columns:repeat(6,minmax(0,1fr))} .kpi-bar dl > div:nth-child(n){display:block} .kpi-bar dd{font-size:min(1.2rem,2.1cqi)}}
+@media (prefers-reduced-motion: reduce){.kpi-bar,.kpi-bar.show{transition:none}}
+/* Headings reached by a link land below the bar instead of under it */
+[id^="h-"]{scroll-margin-top:6rem}
+a.btn-primary{display:inline-flex;align-items:center;justify-content:center;gap:.4rem;text-decoration:none}
+section{padding-top:2.5rem;margin-top:2.5rem;border-top:1px solid var(--line)}
+section > header{margin-bottom:1.25rem}
+a{color:var(--accent);text-underline-offset:3px}
+a.src-a{font-size:.85rem;font-weight:600;text-decoration-thickness:1.5px;border-radius:.25rem;overflow-wrap:anywhere}
+/* Hover: links get a thicker underline and a soft highlight; buttons a tinted background */
+a:hover{text-decoration-thickness:3px;text-underline-offset:4px}
+a.src-a:hover,ul.src a:hover{background:color-mix(in srgb,var(--accent) 14%,transparent);box-shadow:0 0 0 .15rem color-mix(in srgb,var(--accent) 14%,transparent)}
+.btn-primary:hover{background:color-mix(in srgb,var(--accent) 85%,var(--ink))}
+.btn-secondary:hover{background:color-mix(in srgb,var(--accent) 12%,transparent)}
+.dock button:not(:disabled):hover,.dock-sel select:hover{background:color-mix(in srgb,var(--accent) 18%,var(--well))}
+.seg button:hover,.select select:hover,input[type=number]:hover,input.money:hover{box-shadow:inset 0 0 0 2px var(--accent)}
+a.src-a[target="_blank"]::after{content:" ↗";font-weight:400}
+:focus-visible{outline:3px solid var(--focus);outline-offset:3px;border-radius:4px}
+.sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}
+
+/* ---------- Status banner ---------- */
+.banner{margin-top:1.5rem;padding:1rem 1.25rem;border-radius:.75rem;background:var(--warn-well);border-left:.35rem solid var(--warn)}
+.banner strong{color:var(--warn)}
+
+/* ---------- Inputs (a well: secondary surface) ---------- */
+.well{background:var(--well);border-radius:1rem;padding:1.25rem}
+.seg{display:inline-flex;flex-wrap:wrap;gap:.25rem;padding:.25rem;border-radius:.75rem;background:var(--bg);box-shadow:inset 0 0 0 1px var(--line-strong)}
+.seg button{font:inherit;font-size:.95rem;font-weight:600;min-height:2.75rem;padding:.4rem .9rem;border:0;border-radius:.55rem;background:transparent;color:var(--ink-2);cursor:pointer}
+.seg button[aria-pressed="true"]{background:var(--accent);color:var(--accent-ink)}
+.fields{display:grid;gap:1rem;margin-top:1.25rem;grid-template-columns:repeat(auto-fit,minmax(min(100%,13rem),1fr))}
+label{display:block;font-size:.95rem;font-weight:600;margin-bottom:.35rem}
+.hint{display:block;font-size:.85rem;font-weight:400;color:var(--ink-2)}
+input[type=number],input.money{width:100%;font:inherit;font-size:1.05rem;color:var(--ink);background:var(--bg);border:0;
+  box-shadow:inset 0 0 0 1.5px var(--line-strong);border-radius:.55rem;padding:.6rem .75rem;min-height:3rem}
+input:focus-visible,select:focus-visible{outline:3px solid var(--focus);outline-offset:-1px}
+.select{display:inline-grid;grid-template-columns:1fr 2rem;width:100%}
+/* − / + steppers around number fields (native spinners hidden: too small for low vision) */
+.stepper{display:grid;grid-template-columns:3rem minmax(0,1fr) 3rem;gap:.35rem;align-items:stretch}
+.stepper input{text-align:center;-moz-appearance:textfield;appearance:textfield}
+.stepper input::-webkit-outer-spin-button,.stepper input::-webkit-inner-spin-button{-webkit-appearance:none;margin:0}
+.stepper button{font:inherit;font-size:1.5rem;font-weight:700;line-height:1;min-height:3rem;border:0;border-radius:.55rem;cursor:pointer;
+  background:var(--bg);color:var(--accent);box-shadow:inset 0 0 0 1.5px var(--line-strong)}
+.stepper button:hover{background:color-mix(in srgb,var(--accent) 14%,var(--bg));box-shadow:inset 0 0 0 2px var(--accent)}
+.stepper button:active{background:color-mix(in srgb,var(--accent) 24%,var(--bg))}
+.stepper button:focus-visible{outline:3px solid var(--focus);outline-offset:2px}
+.select select{grid-column:1/-1;grid-row:1;appearance:none;width:100%;font:inherit;font-size:1.05rem;color:var(--ink);background:var(--bg);border:0;
+  box-shadow:inset 0 0 0 1.5px var(--line-strong);border-radius:.55rem;padding:.6rem 2rem .6rem .75rem;min-height:3rem}
+.select svg{grid-column:2;grid-row:1;place-self:center;pointer-events:none;color:var(--ink-2)}
+.check{display:flex;gap:.6rem;align-items:flex-start;font-weight:500}
+.check input{width:1.4rem;height:1.4rem;margin:.15rem 0 0;accent-color:var(--accent);flex-shrink:0}
+
+/* ---------- Stat grid (dividers, no cards) ---------- */
+.stats-c{container-type:inline-size}
+.stats{display:grid;grid-template-columns:1fr;margin:0}
+.stat{padding:1rem 0;border-top:1px solid var(--line);min-width:0}
+.stat:first-child{border-top:0;padding-top:0}
+.stat dt{font-size:.95rem;font-weight:500;color:var(--ink-2);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.stat dd{margin:0}
+.stat .v{display:block;font-size:min(2rem,14cqi);font-weight:600;letter-spacing:-.02em;line-height:1.2;margin-top:.25rem;overflow-wrap:anywhere}
+.stat .d{display:block;font-size:.9rem;color:var(--ink-2);margin-top:.25rem}
+.stat.hero .v{color:var(--accent);font-size:min(2.4rem,15cqi)}
+.scen-c{container-type:inline-size}
+.scen .v{font-size:min(1.6rem,11cqi)!important}
+.scen > div{min-width:0}
+@container (min-width:36rem){
+  .stats{grid-template-columns:repeat(2,1fr)}
+  .stat{border-top:0;padding:1rem 1.25rem;border-bottom:1px solid var(--line)}
+  .stat:nth-child(2n+1){padding-left:0}
+  .stat:nth-child(2n){border-left:1px solid var(--line);padding-right:0}
+  .stat:first-child{padding-top:1rem}
+}
+@container (min-width:62rem){
+  .stats{grid-template-columns:repeat(3,1fr)}
+  .stat:nth-child(n){border-left:0;padding:1.25rem 1.5rem}
+  .stat:nth-child(3n+1){padding-left:0}
+  .stat:nth-child(3n){padding-right:0}
+  .stat:not(:nth-child(3n+1)){border-left:1px solid var(--line)}
+  .stat:nth-child(n+4){border-bottom:0}
+}
+
+/* ---------- Charts ---------- */
+.chart-c{position:relative;width:100%;height:calc(22rem)}
+.legend{display:flex;flex-wrap:wrap;gap:.5rem 1.25rem;margin:0;padding:0;list-style:none;font-size:.95rem}
+.legend li{display:flex;align-items:center;gap:.5rem}
+.sw{width:1rem;height:1rem;border-radius:.2rem;flex-shrink:0}
+.sw-line{width:1.4rem;height:0;border-top:3px dashed var(--c-neg);flex-shrink:0}
+.sw-none{width:1.4rem;height:.6rem;border:2px dashed var(--ink-2);border-radius:.2rem;flex-shrink:0}
+.lim-legend{margin:.75rem 0 .5rem}
+.quad-tools > div{max-width:22rem}
+.quad-legend{margin:.25rem 0 .5rem}
+.quad-legend .dot{width:1rem;height:1rem;border-radius:50%;flex-shrink:0}
+.quad-legend .dot.sel{box-shadow:0 0 0 3px var(--bg),0 0 0 5px var(--ink)}
+.quad-legend .dia{width:.8rem;height:.8rem;transform:rotate(45deg);flex-shrink:0;margin:0 .1rem}
+.quad-best{background:color-mix(in srgb,var(--c-interest) 18%,transparent);box-shadow:inset 0 0 0 1px color-mix(in srgb,var(--c-interest) 40%,transparent)}
+.quad-mid{border-top-color:var(--ink-2)}
+.sw.hatch{background-image:repeating-linear-gradient(45deg,currentColor 0 2px,transparent 2px 6px);box-shadow:inset 0 0 0 2px currentColor}
+.split{display:grid;gap:2rem}
+.split > *{min-width:0}
+@media (min-width:960px){.split{grid-template-columns:1.6fr 1fr}}
+
+/* composition */
+.bar{display:flex;height:1.25rem;border-radius:.6rem;overflow:hidden;margin:1rem 0 .75rem;box-shadow:inset 0 0 0 1px var(--line)}
+dl.rows{margin:0}
+dl.rows div{display:flex;flex-wrap:wrap;justify-content:space-between;gap:.25rem 1rem;padding:.6rem 0;border-bottom:1px solid var(--line)}
+dl.rows div:last-child{border-bottom:0}
+dl.rows dt{font-weight:500}
+dl.rows dd{margin:0;font-weight:600;text-align:right}
+.neg{color:var(--c-neg)}
+
+/* ---------- Tables: on the background, row dividers only, sentence-case headings ---------- */
+.tscroll{margin:0 -1rem;overflow-x:auto}
+@media (min-width:640px){.tscroll{margin:0 -1.5rem}}
+.tscroll > div{display:inline-block;min-width:100%;padding:.5rem 1rem;vertical-align:middle}
+@media (min-width:640px){.tscroll > div{padding:.5rem 1.5rem}}
+table{width:100%;border-collapse:collapse;font-size:.95rem}
+th,td{padding:.7rem .75rem;text-align:right;border-bottom:1px solid var(--line);white-space:nowrap;vertical-align:top}
+th{font-weight:600;color:var(--ink);border-bottom:2px solid var(--line-strong)}
+th:first-child,td:first-child{text-align:left;padding-left:0}
+th:last-child,td:last-child{padding-right:0}
+td .sub{display:block;font-size:.85rem;color:var(--ink-2)}
+tr.sel td{font-weight:600}
+tr.sel td:first-child::before{content:"▶ ";color:var(--accent)}
+tfoot td{font-weight:700;border-bottom:0}
+table.prot thead th{text-align:left}
+table.prot th[scope=row]{text-align:left;padding-left:0;border-bottom:1px solid var(--line)}
+table.prot td{white-space:normal;text-align:left;min-width:7.5rem;max-width:16rem;line-height:1.45}
+table.prot thead th{white-space:normal;min-width:6rem}
+#instTbl th,#instTbl td{white-space:normal;max-width:13rem;line-height:1.4;padding-left:.55rem;padding-right:.55rem}
+#instTbl td:first-child{min-width:10rem}
+#instTbl th:nth-child(n+5),#instTbl td:nth-child(n+5){text-align:left}
+#instTbl td:nth-child(5){min-width:9rem}
+#instTbl td .sub{white-space:normal}
+td.wrapcell{white-space:normal;min-width:20rem;max-width:24rem}
+td.wrapcell .sub{margin-top:.35rem;line-height:1.45}
+.risk{display:inline-block;font-weight:700;padding:.1rem .55rem;border-radius:.4rem;box-shadow:inset 0 0 0 1.5px currentColor}
+.risk.r1,.risk.r2{color:var(--c-interest)} .risk.r3{color:var(--warn)} .risk.r4,.risk.r5{color:var(--c-neg)}
+.tag{display:inline-block;font-size:.85rem;font-weight:600;padding:.1rem .55rem;border-radius:99px;box-shadow:inset 0 0 0 1.5px currentColor}
+
+/* ---------- Scenarios ---------- */
+.scen{display:grid;gap:1rem;grid-template-columns:repeat(auto-fit,minmax(min(100%,15rem),1fr));margin-top:1rem}
+.scen > div{padding:1rem 1.25rem;border-radius:.9rem;box-shadow:inset 0 0 0 1px var(--line-strong)}
+.scen .v{font-size:1.6rem;font-weight:600;letter-spacing:-.02em;display:block;margin:.25rem 0}
+.scen .base{box-shadow:inset 0 0 0 2.5px var(--accent)}
+
+ul.src{margin:.5rem 0 0;padding-left:1.25rem}
+ul.src li{margin:.4rem 0}
+
+/* ---------- Font-size dock (bottom-right) ---------- */
+.dock-sel{display:flex;flex-direction:column;gap:.1rem;padding:0 .35rem}
+.dock-sel label{font-size:12px;font-weight:600;color:var(--ink-2);margin:0;line-height:1.2}
+.dock-sel select{font:inherit;font-size:15px;font-weight:600;color:var(--ink);background:var(--well);border:0;border-radius:.55rem;
+  box-shadow:inset 0 0 0 1.5px var(--line-strong);min-height:2.5rem;padding:.2rem .4rem;cursor:pointer}
+.dock .sep{width:1px;align-self:stretch;background:var(--line-strong);margin:0 .2rem}
+/* ---------- Tables become labelled cards whenever they don't fit (class set by fitTable) ---------- */
+.tscroll:has(table.cards){overflow:visible;margin:0}
+.tscroll:has(table.cards) > div{display:block;padding:0;min-width:0}
+table.cards thead{display:none} /* each cell shows its column name via data-label */
+table.cards, table.cards tbody{display:block;width:100%}
+table.cards tr{display:grid;grid-template-columns:repeat(auto-fill,minmax(min(100%,13rem),1fr));gap:.6rem 1.5rem;
+  padding:1rem 0;border-bottom:1.5px solid var(--line-strong)}
+table.cards tr[hidden]{display:none}
+table.cards td, table.cards th[scope=row]{display:block;border:0;padding:0;text-align:left;white-space:normal;min-width:0;max-width:none}
+table.cards td::before, table.cards th[scope=row]::before{content:attr(data-label);display:block;font-size:.85rem;font-weight:600;color:var(--ink-2);margin-bottom:.1rem}
+table.cards tr > :first-child{grid-column:1/-1;font-size:1.05rem;font-weight:600}
+table.cards tr > :first-child::before{content:none}
+table.cards tr.sel > :first-child::before{content:"▶ ";display:inline;color:var(--accent);font-size:inherit}
+table.cards tfoot, table.cards tfoot tr{display:block}
+table.cards tfoot tr{display:grid;border-bottom:0}
+table.cards td > *{max-width:100%;overflow-wrap:anywhere}
+table.cards td,table.cards th[scope=row]{min-width:0!important;max-width:none!important}
+table.cards a.src-a{white-space:normal}
+/* Sort buttons in headers + toolbar */
+th button.sort{all:unset;cursor:pointer;display:inline-flex;align-items:center;gap:.3rem;font-weight:600;border-radius:.3rem;padding:.1rem .2rem;margin:-.1rem -.2rem}
+th button.sort:hover{background:color-mix(in srgb,var(--accent) 12%,transparent)}
+th button.sort:focus-visible{outline:3px solid var(--focus);outline-offset:2px}
+th button.sort .arr::after{content:"↕";color:var(--ink-2);font-size:.85em}
+th[aria-sort=ascending] button.sort .arr::after{content:"↑";color:var(--accent)}
+th[aria-sort=descending] button.sort .arr::after{content:"↓";color:var(--accent)}
+.tbl-tools{display:flex;flex-wrap:wrap;align-items:flex-end;gap:.75rem 1rem;margin:1rem 0 .75rem}
+.tbl-tools > div{display:flex;flex-direction:column;min-width:0;flex:1 1 11rem;max-width:20rem}
+.tbl-tools label,.tbl-tools .lbl-spacer{font-size:.9rem;font-weight:600;margin-bottom:.3rem}
+.tbl-tools input[type=search]{font:inherit;font-size:1rem;color:var(--ink);background:var(--bg);border:0;box-shadow:inset 0 0 0 1.5px var(--line-strong);border-radius:.55rem;padding:.55rem .75rem;min-height:3rem}
+.tbl-tools input[type=search]:hover{box-shadow:inset 0 0 0 2px var(--accent)}
+.tbl-tools input[type=search]:focus-visible{outline:3px solid var(--focus);outline-offset:-1px}
+.tbl-tools .btn-secondary{width:100%;min-height:3rem;padding:.5rem .75rem}
+.tbl-tools .count{flex-basis:100%;margin:0}
+.tbl-tools:not(.cards-mode) .sort-ctl{display:none}
+.tbl-tools.sort-only:not(.cards-mode){display:none}
+details.why{margin-top:.3rem;font-size:.85rem;color:var(--ink-2)}
+details.why summary{cursor:pointer;color:var(--accent);font-weight:600;min-height:1.5rem}
+details.why summary:hover{text-decoration:underline}
+.warn-t{color:var(--c-neg)!important;font-weight:600}
+.src-cell{text-align:left!important;white-space:normal!important;min-width:8rem}
+.actions{display:flex;flex-wrap:wrap;align-items:center;gap:.5rem 1rem;margin-top:1rem}
+.btn-primary{font:inherit;font-size:1rem;font-weight:600;min-height:3rem;padding:.6rem 1.1rem;border:0;border-radius:.6rem;
+  background:var(--accent);color:var(--accent-ink);cursor:pointer}
+.btn-primary:disabled{opacity:.6;cursor:progress}
+.btn-primary:focus-visible{outline:3px solid var(--focus);outline-offset:2px}
+@media (max-width:639px){.btn-primary{width:100%}}
+.dock-panel{display:flex;flex-wrap:wrap;align-items:center;gap:.25rem}
+.dock .dock-toggle{display:none}
+/* Phones: the panel collapses behind one "Aa Ajustes" button so it doesn't cover the page */
+@media (max-width:639px){
+  .dock{right:max(.75rem,env(safe-area-inset-right));bottom:max(.75rem,env(safe-area-inset-bottom));flex-direction:column-reverse;align-items:flex-end;padding:.3rem}
+  .dock .dock-toggle{display:inline-flex;align-items:center;gap:.4rem;padding:0 1rem;font-size:17px;min-height:3rem}
+  .dock .dock-toggle[aria-expanded="true"]{background:var(--accent);color:var(--accent-ink)}
+  .dock-panel{display:none;width:min(22rem,calc(100vw - 2rem));justify-content:space-between;padding:.25rem .1rem .4rem}
+  .dock.open .dock-panel{display:flex}
+  .dock-sel{flex:1 1 9rem}
+  .dock-sel select{width:100%;min-height:3rem}
+  .dock .sep{flex-basis:100%;height:1px;width:auto;margin:.3rem 0}
+}
+.dock{position:fixed;right:1rem;bottom:1rem;z-index:10;display:flex;flex-wrap:wrap;align-items:center;gap:.25rem;padding:.35rem;
+  border-radius:1rem;background:var(--bg);box-shadow:0 0 0 1.5px var(--line-strong),0 8px 24px rgba(0,0,0,.18);font-size:18px}
+.dock button{font:inherit;font-weight:700;min-width:3rem;min-height:3rem;border:0;border-radius:.7rem;background:var(--well);color:var(--ink);cursor:pointer;line-height:1}
+.dock button:disabled{opacity:.4;cursor:not-allowed}
+.dock .pct{min-width:3.6rem;text-align:center;font-size:15px;font-weight:600;color:var(--ink-2)}
+.dock .a-sm{font-size:15px} .dock .a-lg{font-size:22px}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]) .dock{box-shadow:0 0 0 1.5px var(--line-strong)}}
+@media (prefers-reduced-motion: reduce){*{scroll-behavior:auto!important}}
+
+footer{margin-top:3rem;padding-top:1.5rem;border-top:1px solid var(--line);color:var(--ink-2);font-size:.9rem}
+
+/* ---------- Print-friendly version (Ctrl/Cmd+P or the "Imprimir" button) ---------- */
+.print-only{display:none}
+.btn-secondary{font:inherit;font-size:1rem;font-weight:600;min-height:3rem;padding:.6rem 1.1rem;border:0;border-radius:.6rem;
+  background:transparent;color:var(--accent);box-shadow:inset 0 0 0 2px var(--accent);cursor:pointer}
+.btn-secondary:focus-visible{outline:3px solid var(--focus);outline-offset:2px}
+@media (max-width:639px){.btn-secondary{width:100%}}
+@media print{
+  @page{size:letter;margin:14mm 13mm 16mm}
+  html{font-size:10.5pt!important}
+  html,body{background:#fff!important;color:#000!important}
+  *{box-shadow:none!important;text-shadow:none!important}
+  .wrap{max-width:none;padding:0}
+  .dock,.actions,.sr-only,.select svg,#riskNow,.kpi-bar{display:none!important}
+  section>header{break-inside:avoid;page-break-inside:avoid}
+  .scen-c{break-before:avoid}
+  .print-only{display:block!important}
+  .print-head{font-size:9pt;color:#333;border-bottom:1px solid #999;padding-bottom:4pt;margin-bottom:10pt}
+  h1{font-size:20pt} h2{font-size:14pt} h3{font-size:11.5pt}
+  h1,h2,h3,section>header{break-after:avoid;page-break-after:avoid}
+  section{padding-top:10pt;margin-top:12pt;border-top:1px solid #bbb;break-inside:auto}
+  p,li{orphans:3;widows:3}
+  .page-hero{background:none!important;padding:0;border-radius:0}
+  .page-hero::before{content:none}
+  .page-hero h1{font-size:20pt}
+  .hero-result{margin-top:10pt;padding-top:8pt;border-top:1px solid #999;break-inside:avoid;page-break-inside:avoid}
+  .banner{background:none!important;border:1px solid #999;border-left:4pt solid #666}
+  .well{background:none;border:1px solid #bbb;padding:8pt}
+  .fields{grid-template-columns:repeat(4,1fr);gap:6pt}
+  input[type=number],input.money,.select select{min-height:0;padding:2pt 4pt;box-shadow:inset 0 0 0 1px #999!important;background:#fff;color:#000;font-size:10pt}
+  .stats{grid-template-columns:repeat(3,1fr)!important}
+  .stat{padding:6pt 8pt!important;border-bottom:1px solid #ccc}
+  .stat .v{font-size:15pt!important}
+  .split{grid-template-columns:1.5fr 1fr}
+  .scen{grid-template-columns:repeat(4,1fr)}
+  .scen>div{box-shadow:inset 0 0 0 1px #999!important;padding:6pt}
+  .scen .base{box-shadow:inset 0 0 0 2pt #000!important}
+  .scen .v{font-size:13pt!important}
+  .stat,.scen>div,tr,.chart-c,dl.rows div{break-inside:avoid;page-break-inside:avoid}
+  #growthBox{height:8.5cm!important} #instBox{height:15cm!important}
+  .chart-c canvas{max-width:100%!important;height:100%!important}
+  /* Tables: always the full grid on paper, never the cards or a scroll box */
+  .tbl-tools{display:none!important}
+  table.cards{display:table!important} table.cards thead{display:table-header-group!important} table.cards tbody{display:table-row-group!important}
+  table.cards tr{display:table-row!important} table.cards td,table.cards th[scope=row]{display:table-cell!important;text-align:left}
+  table.cards td::before,table.cards th[scope=row]::before{content:none!important}
+  table.cards tr > :first-child{font-size:inherit!important;grid-column:auto!important}
+  table.cards td > *,a.src-a{overflow-wrap:normal!important}
+  #instTbl th,#instTbl td{max-width:none;padding:2pt 3pt}
+  details.why{display:none} th button.sort .arr{display:none}
+  #limBox{height:15cm!important}
+  .tscroll{overflow:visible!important;margin:0!important}
+  .tscroll>div{display:block!important;padding:0!important;min-width:0}
+  table{font-size:8pt;width:100%}
+  thead{display:table-header-group!important}
+  th,td{padding:2.5pt 4pt;white-space:normal;border-bottom:1px solid #ccc}
+  th{border-bottom:1.5pt solid #000}
+  td.wrapcell{min-width:0;max-width:none} td.wrapcell .sub{display:none}
+  table.prot td{min-width:0;max-width:none}
+  .tag,.risk{box-shadow:none!important;padding:0;font-weight:700}
+  a{color:#000!important;text-decoration:underline}
+  a.src-a::after{content:none!important}
+  section[aria-labelledby="h-src"] a::after{content:" — " attr(href);font-size:8pt;word-break:break-all;text-decoration:none}
+}
+</style>
+</head>
+<body>
+<a href="#main" class="sr-only">Ir al contenido</a>
+<!-- Compact copy of the result indicators, pinned to the top once the hero's indicators scroll out of view.
+     Visual aid only (aria-hidden): screen readers already get the full indicators in the hero. -->
+<div class="kpi-bar" id="kpiBar" aria-hidden="true" title="Volver al resultado"><div class="kpi-bar-in"><dl id="kpiBarList"></dl></div></div>
+<div class="wrap" id="main">
+
+<header>
+  <p class="print-only print-head">Fondo de Ahorro · impreso el <span id="printDate"></span> · versión en línea: https://asteri-nomadas.github.io/fondo-ahorro/</p>
+  <!-- Hero: what the calculator answers and, right after, the answer for the current assumptions -->
+  <div class="page-hero">
+    <p class="eyebrow">Modelo económico · Resumen actualizado al 9 de noviembre de 2026</p>
+    <h1>Fondo de Ahorro</h1>
+    <p class="lead" id="lead" aria-live="polite">Cuánto crecerá el ahorro si se depositan $10,000 cada mes durante 10 años, cuánto se lleva la inflación y cuánto se retiene de impuestos.</p>
+    <div class="hero-result" role="region" aria-labelledby="h-kpi">
+      <h2 id="h-kpi" class="hero-h">Resultado al final del plazo</h2>
+      <p class="small muted" id="kpiSub" style="margin-top:.2rem"></p>
+      <div class="stats-c"><dl class="stats" id="kpis"></dl></div>
+      <p class="small muted" id="recon"></p>
+    </div>
+    <div class="actions hero-actions">
+      <a class="btn-primary" href="#h-inputs">Cambiar supuestos <span aria-hidden="true">↓</span></a>
+      <button type="button" id="btnPdf" class="btn-secondary">Descargar reporte en PDF</button>
+      <button type="button" id="btnXlsx" class="btn-secondary">Descargar Excel</button>
+      <button type="button" id="btnPrint" class="btn-secondary">Imprimir</button>
+      <span class="hint" id="pdfStatus" aria-live="polite">El PDF y la impresión incluyen supuestos, resultados, gráficas, escenarios, instrumentos, resumen anual y fuentes. El Excel trae el calendario mes a mes con fórmulas: si cambias un supuesto en Excel, todo se recalcula.</span>
+    </div>
+  </div>
+  <div class="banner" role="note">
+    <strong>Tasa por confirmar.</strong> Mifel sigue anunciando 10% anual en su Cuenta Digital, pero solo sobre los primeros $500,000. Con este plan ese tope se alcanza en <b id="bCross"></b> y, a partir de ahí, el excedente no genera intereses. La tasa es variable y puede cambiar sin aviso. <a class="src-a" href="https://mifel-public-assets.s3.us-east-1.amazonaws.com/d/tyc-cuenta-digital-mifel.pdf" target="_blank" rel="noopener">Fuente: términos de Mifel</a> · <a class="src-a" href="https://www.tasas.mx/institucion/mifel" target="_blank" rel="noopener">Tasas.mx</a>
+  </div>
+</header>
+
+<!-- ===================== INPUTS ===================== -->
+<section aria-labelledby="h-inputs">
+  <header>
+    <h2 id="h-inputs">Supuestos del modelo</h2>
+    <p class="muted">Datos actualizados a noviembre de 2026. Puedes cambiar cualquier número y todo se recalcula.</p>
+  </header>
+  <div class="well">
+    <div class="fields" style="margin-top:0">
+      <div><label for="inInit">Inversión inicial <span class="hint">pesos</span></label><input id="inInit" name="initial" class="money" type="text" inputmode="numeric" autocomplete="off" value="100,000"></div>
+      <div><label for="inDep">Depósito mensual <span class="hint">pesos</span></label><input id="inDep" name="deposit" class="money" type="text" inputmode="numeric" autocomplete="off" value="10,000"></div>
+      <div><label for="inInst">Instrumento <span class="hint">fija la tasa</span></label>
+        <span class="select"><select id="inInst" name="instrument"></select><svg viewBox="0 0 8 5" width="12" height="8" fill="none" aria-hidden="true"><path d="M.5.5 4 4 7.5.5" stroke="currentColor" stroke-width="1.2"/></svg></span></div>
+      <div><label for="inRate">Tasa anual <span class="hint">%, antes de impuestos</span></label><input id="inRate" name="rate" type="number" inputmode="decimal" step="0.25" min="0" value="10"></div>
+      <div><label for="inYears">Plazo <span class="hint">años</span></label><input id="inYears" name="years" type="number" inputmode="numeric" step="1" min="1" max="40" value="10"></div>
+      <div><label for="inInf">Inflación anual <span class="hint">% · <a class="src-a" href="https://www.inegi.org.mx/contenidos/saladeprensa/boletines/2026/inpc/inpc_1q2026_10.pdf" target="_blank" rel="noopener">fuente: INEGI, oct-2026</a></span></label><input id="inInf" name="inflation" type="number" inputmode="decimal" step="0.01" min="0" value="3.62"></div>
+      <div><label for="inIsr">Retención ISR <span class="hint">% anual sobre el saldo · <a class="src-a" href="https://siemprealdia.co/mexico/fiscal/retencion-de-isr-en-intereses-bancarios/" target="_blank" rel="noopener">fuente: LIF 2026, art. 24</a></span></label><input id="inIsr" name="isr" type="number" inputmode="decimal" step="0.05" min="0" value="0.90"></div>
+      <div><label for="inExempt">Saldo exento de retención <span class="hint">pesos (5 UMA anuales) · <a class="src-a" href="https://idconline.mx/fiscal-contable/2026/10/27/isr-por-intereses-2027-cuando-si-te-convendra-declarar" target="_blank" rel="noopener">fuente: IDC</a></span></label><input id="inExempt" name="exempt" class="money" type="text" inputmode="numeric" autocomplete="off" value="213,973"></div>
+    </div>
+    <div style="margin-top:1.25rem"><label class="check" for="inCap"><input id="inCap" name="cap" type="checkbox" checked><span>Aplicar el tope de rendimiento del instrumento <span class="hint" id="capHint">En Mifel, el saldo arriba de $500,000 no genera intereses.</span></span></label>
+      <p class="hint" id="capSrc" style="margin:.4rem 0 0 2rem"></p></div>
+  </div>
+</section>
+
+<!-- ===================== GROWTH + COMPOSITION ===================== -->
+<section aria-labelledby="h-growth">
+  <div class="split">
+    <div>
+      <header><h2 id="h-growth">Crecimiento año por año</h2>
+        <p class="muted">Barras: lo que se ha depositado y los intereses acumulados (después de ISR). Línea con rombos: lo que vale ese saldo en pesos de hoy.</p></header>
+      <div class="chart-c" id="growthBox"><canvas id="growth" role="img" aria-label="Gráfica del saldo al cierre de cada año. Los valores exactos están en la tabla de resumen anual."></canvas></div>
+    </div>
+    <div>
+      <header><h2 id="h-comp">¿De dónde sale el saldo?</h2><p class="muted" id="compSub"></p></header>
+      <div class="bar" id="compBar" aria-hidden="true"></div>
+      <ul class="legend" style="margin-bottom:.75rem"><li><span class="sw" style="background:var(--c-contrib)"></span>Lo depositado</li><li><span class="sw" style="background:var(--c-interest)"></span>Intereses netos</li></ul>
+      <dl class="rows" id="compRows"></dl>
+    </div>
+  </div>
+</section>
+
+<!-- ===================== SCENARIOS ===================== -->
+<section aria-labelledby="h-scen">
+  <header><h2 id="h-scen">Escenarios de tasa</h2>
+    <p class="muted">Las tasas de las cuentas digitales cambian con la tasa de Banxico y las promociones terminan. Así cambia el resultado con otra tasa promedio durante todo el plazo. <a class="src-a" href="https://www.banxico.org.mx/publicaciones-y-prensa/anuncios-de-las-decisiones-de-politica-monetaria/%7B43236252-D06E-5231-27E8-058810A86A52%7D.pdf" target="_blank" rel="noopener">Banxico: decisión del 5-nov-2026</a></p></header>
+  <div class="fields" style="margin-top:0;max-width:30rem">
+    <div><label for="inLow">Tasa del escenario bajo <span class="hint">%</span></label><input id="inLow" name="rateLow" type="number" inputmode="decimal" step="0.25" min="0" value="7"></div>
+    <div><label for="inHigh">Tasa del escenario alto <span class="hint">%</span></label><input id="inHigh" name="rateHigh" type="number" inputmode="decimal" step="0.25" min="0" value="11"></div>
+  </div>
+  <div class="scen-c"><div class="scen" id="scen"></div></div>
+</section>
+
+<!-- ===================== RECOMMENDATION ===================== -->
+<section aria-labelledby="h-rec">
+  <header><h2 id="h-rec">¿Qué opción conviene más y es más segura?</h2>
+    <p class="muted">Comparación de estrategias completas para este plan, con los supuestos de arriba. Información para decidir, no una recomendación de un asesor financiero.</p></header>
+  <div class="scen-c"><div class="scen" id="strat"></div></div>
+  <div style="margin-top:1.5rem;max-width:70ch">
+    <h3>En resumen</h3>
+    <ul class="src">
+      <li><b>Lo más seguro:</b> CETES (Gobierno federal) y depósitos en bancos con IPAB. En ambos el saldo no baja de precio y la garantía cubre todo este plan. <a class="src-a" href="https://www.cetesdirecto.com" target="_blank" rel="noopener">cetesdirecto</a> · <a class="src-a" href="https://www.ipab.org.mx" target="_blank" rel="noopener">IPAB</a></li>
+      <li><b>El mejor equilibrio:</b> Mifel al 10% hasta $500,000 y, cuando se llene, mandar los depósitos nuevos a un segundo banco con IPAB o a CETES. Así nada queda sin generar intereses y todo sigue garantizado. <a class="src-a" href="https://mifel-public-assets.s3.us-east-1.amazonaws.com/d/tyc-cuenta-digital-mifel.pdf" target="_blank" rel="noopener">Términos de Mifel</a></li>
+      <li><b>Con cuidado:</b> las SOFIPOS solo están cubiertas hasta ≈ $221 mil y sus tasas promocionales (13%–15%) suelen bajar. En KLAR con garantía en tarjeta, verifica con PROSOFIPO si el producto está cubierto. <a class="src-a" href="https://www.prosofipo.mx" target="_blank" rel="noopener">PROSOFIPO</a></li>
+      <li><b>Qué vigilar:</b> Mifel y Openbank no tienen fecha de vigencia de su tasa y pueden cambiarla en cualquier momento. Si una opción paga menos que CETES, no compensa su riesgo extra. <a class="src-a" href="https://mifel-public-assets.s3.us-east-1.amazonaws.com/d/tyc-cuenta-digital-mifel.pdf" target="_blank" rel="noopener">Términos de Mifel</a> · <a class="src-a" href="https://www.banxico.org.mx/publicaciones-y-prensa/anuncios-de-las-decisiones-de-politica-monetaria/%7B43236252-D06E-5231-27E8-058810A86A52%7D.pdf" target="_blank" rel="noopener">Banxico, 5-nov-2026</a></li>
+    </ul>
+    <p class="small muted">Contexto oficial de tasas: en su <a class="src-a" href="https://www.banxico.org.mx/publicaciones-y-prensa/anuncios-de-las-decisiones-de-politica-monetaria/%7B43236252-D06E-5231-27E8-058810A86A52%7D.pdf" target="_blank" rel="noopener">anuncio del 5-nov-2026</a>, Banxico bajó su tasa objetivo de 6.50% a 6.25% y anticipó mantenerla por un periodo prolongado. Los CETES a 28 días suelen moverse cerca de esa tasa; la tasa de cada subasta semanal se publica en <a class="src-a" href="https://www.cetesdirecto.com" target="_blank" rel="noopener">cetesdirecto</a>. Con tasas a la baja, las promociones de 13%–15% tienden a reducirse.</p>
+  </div>
+</section>
+
+<!-- ===================== INSTRUMENTS ===================== -->
+<section aria-labelledby="h-inst">
+  <header><h2 id="h-inst">Comparativo de instrumentos</h2>
+    <p class="muted">Tasa anual de cada opción del catálogo. Ojo: hay dos tipos de número. Las <b>tasas anunciadas</b> (barra sólida) son lo que el banco promete hoy. Los <b>rendimientos de 1 año</b> (barra rayada, marcada con *) son lo que un fondo ganó en el pasado y no están garantizados. La línea punteada roja es la inflación. Haz clic en una barra para abrir el sitio oficial del instrumento.</p></header>
+  <ul class="legend" style="margin-bottom:.5rem">
+    <li style="color:var(--ipab)"><span class="sw" style="background:var(--ipab)"></span><span style="color:var(--ink)">IPAB: hasta 400,000 UDIS (≈ $3.5 M) por banco</span></li>
+    <li style="color:var(--sofipo)"><span class="sw" style="background:var(--sofipo)"></span><span style="color:var(--ink)">PROSOFIPO: hasta 25,000 UDIS (≈ $221 mil)</span></li>
+    <li style="color:var(--fund)"><span class="sw hatch"></span><span style="color:var(--ink)">Fondo de inversión: separación patrimonial (Indeval), sin IPAB</span></li>
+    <li style="color:var(--gov)"><span class="sw" style="background:var(--gov)"></span><span style="color:var(--ink)">Gobierno federal (CETES): referencia más segura</span></li>
+    <li style="color:var(--none)"><span class="sw" style="background:var(--none)"></span><span style="color:var(--ink)">Sin seguro de depósito</span></li>
+  </ul>
+  <div class="chart-c" id="instBox"><canvas id="inst" role="img" aria-label="Gráfica de barras con la tasa anual de cada instrumento. Los valores exactos están en la tabla siguiente."></canvas></div>
+
+  <h3 style="margin-top:2rem" id="h-lim">¿Hasta qué saldo genera rendimiento y hasta cuál está protegido?</h3>
+  <p class="small muted" style="max-width:70ch">Cada instrumento tiene dos límites distintos: hasta qué saldo genera rendimiento con su tasa anunciada y hasta qué saldo lo cubre un seguro. Barra rayada = sin límite. La línea roja es el saldo final de tu plan: lo que quede a su izquierda no alcanza a cubrir todo tu dinero. Escala logarítmica.</p>
+  <p class="banner" id="limSum" style="border-left-color:var(--accent);background:var(--well)"></p>
+  <ul class="legend lim-legend" aria-label="Cómo leer la gráfica de límites">
+    <li style="color:var(--c-real)"><span class="sw" style="background:var(--c-real)"></span><span style="color:var(--ink)">Genera rendimiento hasta este saldo</span></li>
+    <li style="color:var(--c-real)"><span class="sw hatch"></span><span style="color:var(--ink)">Genera rendimiento sin límite de saldo</span></li>
+    <li style="color:var(--ipab)"><span class="sw" style="background:var(--ipab)"></span><span style="color:var(--ink)">Protegido por IPAB o PROSOFIPO hasta este saldo</span></li>
+    <li style="color:var(--ipab)"><span class="sw hatch"></span><span style="color:var(--ink)">Protegido sin límite (Gobierno federal)</span></li>
+    <li><span class="sw-line" aria-hidden="true"></span><span>Saldo final de tu plan</span></li>
+    <li><span class="sw-none" aria-hidden="true"></span><span>Falta la barra de rendimiento: tope no publicado · falta la barra de protección: sin seguro de depósito</span></li>
+  </ul>
+  <div class="chart-c" id="limBox"><canvas id="limits" role="img" aria-label="Gráfica que compara, para cada instrumento, hasta qué saldo genera rendimiento y hasta qué saldo está protegido. Los valores están en la columna «Genera rendimiento hasta» de la tabla siguiente."></canvas></div>
+  <p class="small muted">Límites según las tasas recopiladas en junio de 2026; los marcados «por confirmar» conviene verificarlos con cada institución. Seguros: <a class="src-a" href="https://www.ipab.org.mx" target="_blank" rel="noopener">IPAB</a> · <a class="src-a" href="https://www.prosofipo.mx" target="_blank" rel="noopener">PROSOFIPO</a>.</p>
+
+  <h3 style="margin-top:2rem" id="h-quad">Mapa de cuadrantes: riesgo frente a rendimiento</h3>
+  <p class="small muted" style="max-width:70ch">Cada punto es un instrumento. Los ejes están orientados para que lo mejor quede siempre a la derecha y arriba: en riesgo, el más bajo está a la derecha. Las líneas punteadas dividen la gráfica a la mitad de cada eje; el cuadrante sombreado (arriba a la derecha) es el mejor en ambos. Cambia los ejes para comparar con otro indicador.</p>
+  <div class="tbl-tools quad-tools">
+    <div><label for="quadX">Eje horizontal</label><span class="select"><select id="quadX" name="quadX"></select><svg viewBox="0 0 8 5" width="12" height="8" fill="none" aria-hidden="true"><path d="M.5.5 4 4 7.5.5" stroke="currentColor" stroke-width="1.2"/></svg></span></div>
+    <div><label for="quadY">Eje vertical</label><span class="select"><select id="quadY" name="quadY"></select><svg viewBox="0 0 8 5" width="12" height="8" fill="none" aria-hidden="true"><path d="M.5.5 4 4 7.5.5" stroke="currentColor" stroke-width="1.2"/></svg></span></div>
+    <div><span class="lbl-spacer" aria-hidden="true"> </span><label class="check" for="quadNames" style="margin:0;align-items:center;min-height:3rem"><input id="quadNames" name="quadNames" type="checkbox" checked><span>Mostrar nombres</span></label></div>
+  </div>
+  <ul class="legend quad-legend" aria-label="Cómo leer el mapa de cuadrantes">
+    <li><span class="dot" style="background:var(--ipab)"></span><span>IPAB</span></li>
+    <li><span class="dot" style="background:var(--sofipo)"></span><span>PROSOFIPO</span></li>
+    <li><span class="dot" style="background:var(--gov)"></span><span>Gobierno federal</span></li>
+    <li><span class="dot" style="background:var(--none)"></span><span>Sin seguro</span></li>
+    <li><span class="dia" style="background:var(--fund)"></span><span>Fondo de inversión (rombo: rendimiento pasado)</span></li>
+    <li><span class="dot sel" style="background:var(--ipab)"></span><span>Contorno grueso: instrumento elegido</span></li>
+    <li><span class="sw quad-best" aria-hidden="true"></span><span>Cuadrante sombreado: mejor en ambos ejes</span></li>
+    <li><span class="sw-line quad-mid" aria-hidden="true"></span><span>Línea punteada: mitad de cada eje</span></li>
+  </ul>
+  <div class="chart-c" id="quadBox"><canvas id="quad" role="img" aria-label="Mapa de cuadrantes de los instrumentos. El resumen de abajo lista los del mejor cuadrante; los valores exactos están en la tabla siguiente."></canvas></div>
+  <p class="banner" id="quadSum" style="border-left-color:var(--accent);background:var(--well)"></p>
+
+  <h3 style="margin-top:2rem" id="h-prot">Diferencias entre los tipos de protección</h3>
+  <p class="small muted" style="max-width:70ch">Qué pasa con el dinero si la institución tiene problemas, según el tipo de protección de cada instrumento.</p>
+  <div class="tscroll"><div><table aria-labelledby="h-prot" class="prot stack" id="protTbl">
+    <thead><tr><th scope="col">Protección</th><th scope="col">Quién respalda</th><th scope="col">Límite por persona</th><th scope="col">Qué cubre</th><th scope="col">Si la institución quiebra</th><th scope="col">¿Puede bajar de valor?</th><th scope="col">Ejemplos del catálogo</th></tr></thead>
+    <tbody>
+      <tr><th scope="row"><span class="tag" style="color:var(--gov)">Gobierno federal</span></th><td>El Gobierno de México: CETES son deuda directa del gobierno.</td><td>Sin límite.</td><td>Todo lo invertido más los intereses pactados.</td><td>No aplica: el emisor es el gobierno, el riesgo más bajo en pesos.</td><td>Casi no. Solo si se vende antes de vencer, y en plazos cortos el efecto es mínimo.</td><td>CETES 28 días</td></tr>
+      <tr><th scope="row"><span class="tag" style="color:var(--ipab)">IPAB</span></th><td>Instituto para la Protección al Ahorro Bancario, organismo público.</td><td>400,000 UDIS (≈ $3.5 M) por banco.</td><td>Depósitos en bancos: cuentas, pagarés y CEDES, con sus intereses.</td><td>El IPAB paga directamente al ahorrador hasta el límite.</td><td>No. El saldo no cambia de precio.</td><td>Mifel, Plata, Now bank, Openbank, Revolut, pagarés Actinver</td></tr>
+      <tr><th scope="row"><span class="tag" style="color:var(--sofipo)">PROSOFIPO</span></th><td>Fondo de protección financiado por las propias SOFIPOS.</td><td>25,000 UDIS (≈ $221 mil) por SOFIPO.</td><td>Depósitos en SOFIPOS autorizadas, hasta el límite.</td><td>Se paga hasta el límite; lo que pase de ahí puede perderse.</td><td>No por precio, pero sí hay riesgo de perder lo no cubierto.</td><td>KLAR, Didi, NU (en KLAR garantía en TDC, confirma la cobertura con PROSOFIPO)</td></tr>
+      <tr><th scope="row"><span class="tag" style="color:var(--fund)">Fondo de inversión</span></th><td>Nadie lo garantiza; los activos son de los inversionistas, separados de la operadora y custodiados en Indeval.</td><td>No hay seguro.</td><td>Separación patrimonial: si la operadora quiebra, los activos siguen siendo de los inversionistas.</td><td>Los activos se transfieren a otra operadora; no se pierden por la quiebra.</td><td>Sí. El precio sube y baja con el mercado (riesgo 1 a 7).</td><td>Fondos BBVA (B+EDUCA, BBVAPZO, BBVAGLP…)</td></tr>
+      <tr><th scope="row"><span class="tag" style="color:var(--none)">Sin seguro</span></th><td>Solo la solidez de la empresa.</td><td>Ninguno.</td><td>Nada garantizado.</td><td>El dinero puede perderse total o parcialmente.</td><td>Depende del producto.</td><td>Mercado Pago (tasa base)</td></tr>
+    </tbody>
+  </table></div></div>
+  <p class="small muted">Fuentes: <a class="src-a" href="https://www.ipab.org.mx" target="_blank" rel="noopener">IPAB</a> · <a class="src-a" href="https://www.prosofipo.mx" target="_blank" rel="noopener">PROSOFIPO</a> · <a class="src-a" href="https://www.cetesdirecto.com" target="_blank" rel="noopener">cetesdirecto</a> · <a class="src-a" href="https://www.banxico.org.mx" target="_blank" rel="noopener">Banxico (valor de la UDI)</a>. Separación patrimonial de los fondos: Ley de Fondos de Inversión.</p>
+
+  <h3 style="margin-top:2rem">Mismo plan con cada instrumento</h3>
+  <p class="small muted">Saldo después de retención ISR, con el tope de cada instrumento si la casilla de topes está marcada. La fila marcada con ▶ es el instrumento elegido.</p>
+  <p class="banner" id="riskNow" style="border-left-color:var(--accent);background:var(--well)"></p>
+  <div class="tscroll"><div><table id="instTbl" class="stack"></table></div></div>
+  <h3 style="margin-top:2rem">Cómo se estimó el riesgo</h3>
+  <p class="muted" style="max-width:70ch">Los fondos BBVA tienen una calificación oficial (anaquel de fondos BBVA al 10-jun-2026) con dos partes: la letra mide la calidad de crédito (AAA es la mejor) y el número mide qué tanto puede subir o bajar su precio, del 1 (casi nada) al 7 (mucho). Las cuentas, pagarés y SOFIPOS no tienen esa calificación, así que se estimó un equivalente (marcado con †):</p>
+  <ul class="src muted" style="max-width:70ch">
+    <li><b>Bancos con IPAB → AAA/1.</b> El saldo no cambia de precio y el gobierno garantiza hasta 400,000 UDIS (≈ $3.5 M) por persona y por banco. <a class="src-a" href="https://www.ipab.org.mx" target="_blank" rel="noopener">IPAB</a></li>
+    <li><b>SOFIPOS → AA/1 si todo el saldo está cubierto; BBB/1 si no.</b> PROSOFIPO solo cubre 25,000 UDIS (≈ $221 mil); lo que pase de ahí depende de la salud de la SOFIPO. <a class="src-a" href="https://www.prosofipo.mx" target="_blank" rel="noopener">PROSOFIPO</a></li>
+    <li><b>Sin seguro → BBB/1.</b> No hay garantía si la institución falla.</li>
+  </ul>
+  <p class="muted" style="max-width:70ch"><b>Riesgo global (1 a 5)</b> junta todo en un solo número: 1 muy bajo, 2 bajo, 3 moderado, 4 medio-alto, 5 alto. Se calcula con el saldo final de este plan, así que cambia si cambias los depósitos o el plazo. Es una estimación propia, no una calificación de una agencia.</p>
+</section>
+
+<!-- ===================== ANNUAL TABLE ===================== -->
+<section aria-labelledby="h-year">
+  <header><h2 id="h-year">Resumen anual</h2><p class="muted">Suma por año del cálculo mes a mes.</p></header>
+  <div class="tscroll"><div><table id="yearTbl"></table></div></div>
+</section>
+
+
+<!-- ===================== SOURCES ===================== -->
+<section aria-labelledby="h-src">
+  <header><h2 id="h-src">Fuentes y fecha de los datos</h2></header>
+  <ul class="src">
+    <li><b>Inflación:</b> 3.62% anual, INPC 1ª quincena de octubre de 2026 (INEGI, publicado el 22-oct-2026). El dato mensual de octubre sale el 9-nov-2026. <a href="https://www.inegi.org.mx/contenidos/saladeprensa/boletines/2026/inpc/inpc_1q2026_10.pdf">Boletín INEGI</a>.</li>
+    <li><b>Cuenta Digital Mifel:</b> 10% anual bruto sobre saldos hasta $500,000; el excedente no genera rendimiento; tasa variable. <a href="https://mifel-public-assets.s3.us-east-1.amazonaws.com/d/tyc-cuenta-digital-mifel.pdf">Términos Mifel</a>, <a href="https://www.tasas.mx/institucion/mifel">Tasas.mx</a> (verificado 22-oct-2026), <a href="https://kodisun.app/instituciones/mifel.html">Kodisun</a>.</li>
+    <li><b>Pagaré Digital Mifel:</b> 6.50% bruto a 90 días (Mifel, consultado en junio de 2026).</li>
+    <li><b>Retención ISR 2026:</b> 0.90% anual sobre el capital, art. 24 de la Ley de Ingresos 2026 (antes 0.50%). <a href="https://siemprealdia.co/mexico/fiscal/retencion-de-isr-en-intereses-bancarios/">Siempre al día</a>, <a href="https://idconline.mx/fiscal-contable/2026/10/27/isr-por-intereses-2027-cuando-si-te-convendra-declarar">IDC</a>. La propuesta para 2027 es 0.68%.</li>
+    <li><b>Tasa de Banxico y CETES:</b> Banxico bajó su tasa objetivo a 6.25% el 5-nov-2026 (<a href="https://www.banxico.org.mx/publicaciones-y-prensa/anuncios-de-las-decisiones-de-politica-monetaria/%7B43236252-D06E-5231-27E8-058810A86A52%7D.pdf">anuncio oficial</a>; <a href="https://www.banxico.org.mx/publicaciones-y-prensa/anuncios-de-las-decisiones-de-politica-monetaria/anuncios-politica-monetaria-t.html">todos los anuncios</a>). En la calculadora, CETES 28 días ≈ 6.25% (aproximación); la tasa de cada subasta semanal está en <a href="https://www.cetesdirecto.com">cetesdirecto</a>. Mifel puede cambiar su tasa sin previo aviso según sus <a href="https://mifel-public-assets.s3.us-east-1.amazonaws.com/d/tyc-cuenta-digital-mifel.pdf">términos</a>.</li>
+    <li><b>Protecciones y referencias oficiales:</b> <a href="https://www.ipab.org.mx" target="_blank" rel="noopener">IPAB</a> (400,000 UDIS por banco), <a href="https://www.prosofipo.mx" target="_blank" rel="noopener">PROSOFIPO</a> (25,000 UDIS por SOFIPO), <a href="https://www.cetesdirecto.com" target="_blank" rel="noopener">cetesdirecto</a> (CETES), <a href="https://www.banxico.org.mx" target="_blank" rel="noopener">Banxico</a> (valor diario de la UDI).</li>
+    <li><b>Demás tasas de cuentas y SOFIPOS:</b> tasas recopiladas en junio de 2026; confirma la tasa vigente con cada institución.</li>
+    <li><b>Fondos BBVA:</b> rendimiento a 1 año de la serie de entrada al 10-jun-2026 (anaquel de fondos BBVA). Rendimientos pasados, no garantizados.</li>
+  </ul>
+</section>
+
+<footer>
+  Cómo se calcula: cada mes, saldo nuevo = saldo × (1 + tasa/12) − retención ISR + depósito. El valor en pesos de hoy divide entre (1 + inflación)<sup>años</sup>. Esto es un resumen informativo, no una recomendación de inversión. Todas las fuentes, con fecha, están en <a href="#h-src">Fuentes y fecha de los datos</a>.
+</footer>
+</div>
+
+<!-- Font-size controls -->
+<div class="dock" id="dock">
+  <button type="button" class="dock-toggle" id="dockToggle" aria-expanded="false" aria-controls="dockPanel"><span aria-hidden="true">Aa</span> Ajustes</button>
+  <div class="dock-panel" id="dockPanel" role="group" aria-label="Apariencia: colores, tema y tamaño del texto">
+  <div class="dock-sel"><label for="selPal">Colores</label>
+    <select id="selPal" name="palette">
+      <option value="clasico">Clásico (verde)</option>
+      <option value="okabe">Aptos daltonismo</option>
+      <option value="contraste">Alto contraste</option>
+      <option value="calido">Cálido</option>
+    </select></div>
+  <div class="dock-sel"><label for="selTheme">Tema</label>
+    <select id="selTheme" name="theme">
+      <option value="light">Claro</option>
+      <option value="auto">Automático</option>
+      <option value="dark">Oscuro</option>
+    </select></div>
+  <span class="sep" aria-hidden="true"></span>
+  <button type="button" class="a-sm" id="fsDown" aria-label="Reducir tamaño del texto">A−</button>
+  <span class="pct" id="fsPct" aria-live="polite">100%</span>
+  <button type="button" class="a-lg" id="fsUp" aria-label="Aumentar tamaño del texto">A+</button>
+  </div>
+</div>
+
+<script>
+// kind: "anunciada" = tasa que el banco promete hoy; "hist" = rendimiento pasado de 1 año
+const INSTRUMENTS = [
+  {n:"Cuenta Digital Mifel", r:.10, cat:"Cuenta digital (banco)", prot:"IPAB", kind:"anunciada", cap:500000, lim:{upto:500000,txt:"10% hasta $500,000; arriba no genera intereses"}},
+  {n:"Plata", r:.10, cat:"Cuenta digital (banco)", prot:"IPAB", kind:"anunciada", req:"Comisión $45 – $115"},
+  {n:"KLAR garantía en TDC", r:.13, cat:"Cuenta digital (SOFIPO)", prot:"PROSOFIPO", kind:"anunciada", req:"Tener tarjeta de crédito", lim:{unknown:true,txt:"Tope no publicado"}},
+  {n:"KLAR (1 día flexible)", r:.08, cat:"Cuenta digital (SOFIPO)", prot:"PROSOFIPO", kind:"anunciada", req:"Gastar $3,000 al mes"},
+  {n:"Didi (excedente)", r:.075, cat:"Cuenta digital (SOFIPO)", prot:"PROSOFIPO", kind:"anunciada", lim:{txt:"15% en los primeros $10,000; 7.5% en el resto"}},
+  {n:"Now bank", r:.075, cat:"Cuenta digital (banco)", prot:"IPAB", kind:"anunciada"},
+  {n:"Openbank", r:.073, cat:"Cuenta digital (banco)", prot:"IPAB", kind:"anunciada", lim:{upto:1000000,confirm:true,txt:"Tasa hasta $1,000,000 (por confirmar)"}},
+  {n:"Revolut", r:.07, cat:"Cuenta digital (banco)", prot:"IPAB", kind:"anunciada", lim:{upto:1000000,confirm:true,txt:"Tasa hasta $1,000,000 (por confirmar)"}},
+  {n:"Pagaré Digital Mifel (90 días)", r:.065, cat:"Plazo fijo", prot:"IPAB", kind:"anunciada"},
+  {n:"NU (cajita 24/7)", r:.065, cat:"Cuenta digital (SOFIPO)", prot:"PROSOFIPO", kind:"anunciada"},
+  {n:"Pagaré Platinum Actinver", r:.0664, cat:"Plazo fijo", prot:"IPAB", kind:"anunciada", req:"Desde $10,000", lim:{txt:"Desde $10,000; sin tope publicado"}},
+  {n:"CD Platinum Actinver", r:.0655, cat:"Plazo fijo", prot:"IPAB", kind:"anunciada", req:"Desde $100,000", lim:{upto:999999,txt:"De $100,000 a $999,999"}},
+  {n:"CETES 28 días (referencia)", r:.0625, cat:"Gobierno federal · cetesdirecto", prot:"GOBIERNO", kind:"anunciada", req:"≈ tasa objetivo de Banxico; verifica la subasta semanal"},
+  {n:"Mercado Pago (tasa base)", r:.06, cat:"Cuenta digital", prot:"NINGUNA", kind:"anunciada"},
+  {n:"BBVAGLP serie C", r:.0931, cat:"Largo plazo gubernamental · AAA/5", prot:"FONDO", kind:"hist"},
+  {n:"BBVACOR serie C", r:.0839, cat:"Deuda corporativa · AA/4", prot:"FONDO", kind:"hist"},
+  {n:"BBVADGA serie C", r:.0766, cat:"Deuda gubernamental · AAA/5", prot:"FONDO", kind:"hist"},
+  {n:"BBVAPZO serie B", r:.0694, cat:"Mediano plazo – bonos · AA/3", prot:"FONDO", kind:"hist"},
+  {n:"BBVAUDI serie C", r:.0687, cat:"Tasa real en UDIS · AAA/6", prot:"FONDO", kind:"hist"},
+  {n:"BBVA B+EDUCA serie B", r:.0632, cat:"Corto plazo gubernamental · AAA/1", prot:"FONDO", kind:"hist"},
+];
+// How much of the balance earns the advertised rate, and how much is insured.
+const limitOf=x=>x.lim||(x.prot==="GOBIERNO"?{txt:"Sin límite"}:x.prot==="FONDO"?{txt:"Sin límite (fondo de inversión)"}:{txt:"Sin tope publicado"});
+const rateUpto=x=>{const l=limitOf(x);return l.unknown?null:(l.upto??Infinity);};          // null = no data
+const coverOf=x=>x.prot==="GOBIERNO"?Infinity:x.prot==="IPAB"||x.prot==="PROSOFIPO"?COVER[x.prot]:0;
+const coverTxt=x=>x.prot==="GOBIERNO"?"Sin límite (Gobierno federal)":x.prot==="IPAB"?"IPAB: hasta ≈ $3.5 M por banco":x.prot==="PROSOFIPO"?"PROSOFIPO: hasta ≈ $221 mil":x.prot==="FONDO"?"Sin seguro; activos separados de la operadora":"Sin seguro de depósito";
+
+// ---------- Risk: published fund ratings + estimated equivalents for the rest ----------
+// Fund scale (BBVA / CNBV style): credit grade / market-risk 1 (lowest) – 7.
+const PUBLISHED={"BBVAGLP serie C":"AAA/5","BBVACOR serie C":"AA/4","BBVADGA serie C":"AAA/5","BBVAPZO serie B":"AA/3","BBVAUDI serie C":"AAA/6","BBVA B+EDUCA serie B":"AAA/1"};
+const COVER={IPAB:400000*8.843769, PROSOFIPO:25000*8.843769};
+const RISK_LBL=["","Muy bajo","Bajo","Moderado","Medio-alto","Alto"];
+function riskOf(x,finalBal){
+  if(PUBLISHED[x.n]){
+    const [cr,mk]=PUBLISHED[x.n].split("/"); const m=+mk;
+    const score=Math.min(5,(cr==="AAA"?0:1)+(m<=1?1:m<=3?2:3));
+    return {rating:PUBLISHED[x.n],est:false,score,insured:0,why:`Calificación publicada por BBVA. Riesgo de mercado ${m} de 7: el valor puede bajar en el corto plazo.`};
+  }
+  if(x.prot==="GOBIERNO"){
+    return {rating:"AAA/1",est:true,score:1,insured:1,why:"Deuda del Gobierno Federal: el emisor más seguro en pesos, sin límite de monto. Es la tasa de referencia: lo que pague menos que CETES no compensa su riesgo extra."};
+  }
+  if(x.n==="KLAR garantía en TDC"){
+    return {rating:"BBB/1",est:true,score:4,insured:0,why:"Cobertura sin confirmar: verifica con PROSOFIPO si el dinero dejado como garantía de la tarjeta de crédito está cubierto. Tasa ligada a tener su tarjeta de crédito."};
+  }
+  // deposits: no price swings (market 1); credit depends on insurance vs. balance
+  const cap=COVER[x.prot]||0, insured=Math.min(1,cap/Math.max(finalBal,1));
+  const liq=x.cat==="Plazo fijo";
+  if(x.prot==="IPAB"){
+    return {rating:"AAA/1",est:true,score:insured>=1?1:2,insured,why:`Depósito bancario con garantía IPAB (≈ ${short(cap)}). El saldo no fluctúa.${liq?" Dinero inmovilizado hasta el vencimiento.":""}`};
+  }
+  if(x.prot==="PROSOFIPO"){
+    return {rating:insured>=1?"AA/1":"BBB/1",est:true,score:insured>=1?2:insured>=.5?3:4,insured,
+      why:`SOFIPO: entidad más pequeña que un banco. PROSOFIPO cubre ≈ ${short(cap)}; con este plan, ${Math.round((1-insured)*100)}% del saldo final quedaría sin cobertura.`};
+  }
+  return {rating:"BBB/1",est:true,score:4,insured:0,why:"Sin seguro de depósito: si la institución falla, no hay garantía."};
+}
+
+const MONTHS=["enero","febrero","marzo","abril","mayo","junio","julio","agosto","septiembre","octubre","noviembre","diciembre"];
+const START=new Date(2026,5,9);
+
+const $=id=>document.getElementById(id);
+const mxn=v=>(v<0?"−":"")+Math.abs(v).toLocaleString("es-MX",{style:"currency",currency:"MXN",maximumFractionDigits:0});
+const short=v=>Math.abs(v)>=1e6?"$"+(v/1e6).toFixed(1)+" M":"$"+Math.round(v/1e3)+" mil";
+const pct=v=>(v*100).toFixed(2)+"%";
+const css=n=>getComputedStyle(document.documentElement).getPropertyValue(n).trim();
+const LNK=(u,t)=>`<a class="src-a" href="${u}" target="_blank" rel="noopener">${t}</a>`;
+const U={mifel:"https://mifel-public-assets.s3.us-east-1.amazonaws.com/d/tyc-cuenta-digital-mifel.pdf",banxico:"https://www.banxico.org.mx/publicaciones-y-prensa/anuncios-de-las-decisiones-de-politica-monetaria/%7B43236252-D06E-5231-27E8-058810A86A52%7D.pdf",cetes:"https://www.cetesdirecto.com"};
+// Official page of each instrument (checked 11-nov-2026). DiDi's account has no public product page,
+// so it points to press coverage of its rates.
+const OFFICIAL={
+  "Cuenta Digital Mifel":["https://www.mifel.com.mx/personas/cuentas-personales-mifel","Sitio Mifel"],
+  "Pagaré Digital Mifel (90 días)":["https://www.mifel.com.mx/personas/cuentas-personales-mifel","Sitio Mifel"],
+  "Plata":["https://bancoplata.mx/es","Sitio Banco Plata"],
+  "KLAR garantía en TDC":["https://www.klar.mx","Sitio KLAR"],
+  "KLAR (1 día flexible)":["https://www.klar.mx","Sitio KLAR"],
+  "Didi (excedente)":["https://www.xataka.com.mx/empresas-y-economia/didi-lanza-su-cuenta-ahorro-mexico-15-rendimiento-anual-dinero-disponible-24-7","Nota sobre DiDi Cuenta"],
+  "Now bank":["https://www.now.bank","Sitio Now Bank (INVEX)"],
+  "Openbank":["https://www.openbank.mx","Sitio Openbank"],
+  "Revolut":["https://www.revolut.com/es-MX/","Sitio Revolut"],
+  "NU (cajita 24/7)":["https://nu.com.mx","Sitio Nu"],
+  "Pagaré Platinum Actinver":["https://actinver.com","Sitio Actinver"],
+  "CD Platinum Actinver":["https://actinver.com","Sitio Actinver"],
+  "CETES 28 días (referencia)":["https://www.cetesdirecto.com","cetesdirecto"],
+  "Mercado Pago (tasa base)":["https://www.mercadopago.com.mx","Sitio Mercado Pago"],
+};
+const BBVA_FUNDS=["https://www.bbva.mx/personas/productos/inversion/fondos-de-inversion.html","Fondos BBVA"];
+const officialOf=x=>OFFICIAL[x.n]||(x.kind==="hist"?BBVA_FUNDS:null);
+function srcOf(x){
+  const o=officialOf(x), off=o?LNK(o[0],o[1])+"<br>":"";
+  return off+srcData(x);
+}
+function srcData(x){
+  if(x.n==="Cuenta Digital Mifel") return LNK(U.mifel,"Términos Mifel")+" · "+LNK("https://www.tasas.mx/institucion/mifel","Tasas.mx");
+  if(x.prot==="GOBIERNO") return "Tasa: "+LNK(U.banxico,"Banxico, 5-nov-2026"); // official link (cetesdirecto) is added by srcOf
+  if(x.n==="KLAR garantía en TDC") return "Tasa de jun-2026 · "+LNK("https://www.prosofipo.mx","verifica cobertura en PROSOFIPO");
+  if(x.kind==="hist") return "Anaquel BBVA, 10-jun-2026";
+  if(x.n.startsWith("Pagaré Digital Mifel")) return "Mifel, jun-2026";
+  return "Tasa recopilada en jun-2026; confírmala";
+}
+const PCOL={IPAB:"--ipab",PROSOFIPO:"--sofipo",FONDO:"--fund",GOBIERNO:"--gov"};
+const protColor=p=>css(PCOL[p]||"--none");
+const protLabel=p=>({IPAB:"IPAB",PROSOFIPO:"PROSOFIPO",FONDO:"Fondo",NINGUNA:"Sin seguro",GOBIERNO:"Gobierno federal"}[p]);
+
+// Monthly engine: balance × (1 + rate/12) − ISR withholding + deposit, with an optional interest cap
+function simulate({P0,dep,rate,years,infl,isr=0,exempt=0,cap=null,spill=0}){
+  const n=Math.round(years*12), mInf=Math.pow(1+infl,1/12)-1;
+  let bal=P0, contrib=P0, interest=0, tax=0, erosion=0, cross=null;
+  const yearly=[]; let yI=0,yT=0,yE=0,yC=0;
+  for(let m=1;m<=n;m++){
+    const earning=cap?Math.min(bal,cap):bal, excess=cap?Math.max(0,bal-cap):0;
+    const i=earning*rate/12+excess*spill/12, t=Math.max(0,bal-exempt)*isr/12, e=bal*mInf;
+    interest+=i; tax+=t; erosion+=e; yI+=i; yT+=t; yE+=e; yC+=dep;
+    bal=bal+i-t+dep; contrib+=dep;
+    if(cross===null&&bal>500000) cross=m;
+    if(m%12===0||m===n){ yearly.push({year:Math.ceil(m/12),contrib,bal,real:bal/Math.pow(1+infl,m/12),yI,yT,yE,yC}); yI=yT=yE=yC=0; }
+  }
+  return {bal,contrib,interest,tax,erosion,real:bal/Math.pow(1+infl,n/12),yearly,cross,n};
+}
+const monthLabel=m=>{const d=new Date(START);d.setMonth(d.getMonth()+m);return `${MONTHS[d.getMonth()]} de ${d.getFullYear()}`;};
+const realRate=(r,infl)=>Math.pow(1+r/12,12)/(1+infl)-1; // Fisher on effective annual rate
+
+// ---------- inputs ----------
+// Peso fields show thousands separators (100,000) while typing; the calculator reads only the digits.
+const parseMoney=v=>parseFloat(String(v).replace(/[^\d.]/g,""))||0;
+function fmtMoney(el){
+  const caretDigits=(el.value.slice(0,el.selectionStart??el.value.length).match(/\d/g)||[]).length;
+  const digits=el.value.replace(/\D/g,"").replace(/^0+(?=\d)/,"");
+  el.value=digits?Number(digits).toLocaleString("es-MX"):"";
+  if(document.activeElement===el){let pos=0,c=0;while(pos<el.value.length&&c<caretDigits){if(/\d/.test(el.value[pos]))c++;pos++;}el.setSelectionRange(pos,pos);}
+}
+document.querySelectorAll("input.money").forEach(el=>{fmtMoney(el);el.addEventListener("input",()=>fmtMoney(el));});
+// − / + buttons and ↑/↓ keys for every number field
+const STEPS_BY_ID={inInit:10000,inDep:500,inExempt:1000,inRate:.25,inYears:1,inInf:.1,inIsr:.05,inLow:.25,inHigh:.25};
+function stepField(el,dir){
+  const st=STEPS_BY_ID[el.id], money=el.classList.contains("money");
+  const cur=money?parseMoney(el.value):(+el.value||0), dec=(String(st).split(".")[1]||"").length;
+  let v=Math.max(el.id==="inYears"?1:0,+(cur+dir*st).toFixed(Math.max(dec,2)));
+  if(el.id==="inYears") v=Math.min(40,v);
+  el.value=money?v.toLocaleString("es-MX"):(dec?v.toFixed(Math.max(dec,2)):String(v));
+  el.dispatchEvent(new Event("input",{bubbles:true}));
+}
+Object.keys(STEPS_BY_ID).forEach(id=>{
+  const el=$(id); if(!el) return;
+  const name=(document.querySelector(`label[for="${id}"]`)?.childNodes[0]?.textContent||id).trim();
+  const wrap=document.createElement("div"); wrap.className="stepper"; el.before(wrap);
+  const mk=(dir,sym,lbl)=>{const b=document.createElement("button");b.type="button";b.textContent=sym;b.setAttribute("aria-label",`${lbl} ${name}`);
+    b.addEventListener("click",()=>stepField(el,dir));return b;};
+  wrap.append(mk(-1,"−","Disminuir"),el,mk(1,"+","Aumentar"));
+  el.addEventListener("keydown",e=>{if(e.key==="ArrowUp"||e.key==="ArrowDown"){e.preventDefault();stepField(el,e.key==="ArrowUp"?1:-1);}});
+});
+const sel=$("inInst");
+INSTRUMENTS.forEach(it=>{const o=document.createElement("option");o.value=it.n;o.textContent=`${it.n} — ${pct(it.r)}${it.kind==="hist"?" *":""}`;sel.appendChild(o);});
+sel.value="Cuenta Digital Mifel";
+const inst=()=>INSTRUMENTS.find(x=>x.n===sel.value);
+sel.addEventListener("change",()=>{$("inRate").value=(inst().r*100).toFixed(2);render();});
+["inInit","inDep","inRate","inYears","inInf","inIsr","inExempt","inLow","inHigh","inCap"].forEach(id=>$(id).addEventListener("input",render));
+
+
+function read(){
+  const it=inst();
+  return {P0:parseMoney($("inInit").value), dep:parseMoney($("inDep").value), rate:(+$("inRate").value||0)/100,
+    years:Math.max(1,+$("inYears").value||1), infl:(+$("inInf").value||0)/100,
+    isr:(+$("inIsr").value||0)/100, exempt:parseMoney($("inExempt").value),
+    cap:$("inCap").checked&&it.cap?it.cap:null,
+    low:(+$("inLow").value||0)/100, high:(+$("inHigh").value||0)/100};
+}
+
+let gChart,iChart,LAST=null,NOANIM=false;
+// Phones show wide tables as cards: each cell gets its column name as a label.
+function labelStack(t){
+  const heads=[...t.querySelectorAll("thead th")].map(th=>th.textContent.trim());
+  [...t.tBodies[0].rows].forEach((r,i)=>{if(r.dataset.i===undefined)r.dataset.i=i;});
+  t.querySelectorAll("tbody tr, tfoot tr").forEach(tr=>[...tr.children].forEach((c,i)=>c.setAttribute("data-label",heads[i]||"")));
+}
+const narrow=()=>matchMedia("(max-width:639px)").matches;
+function render(){
+  const a=read(), s=simulate(a), it=inst();
+  const gross=simulate({...a,isr:0});
+  const netInt=s.interest-s.tax, realGain=netInt-s.erosion;
+
+  $("bCross").textContent=s.cross?`${monthLabel(s.cross)} (año ${Math.ceil(s.cross/12)} del plan, mes ${s.cross})`:"— (no se alcanza con estos supuestos)";
+  $("kpiSub").textContent=`${a.years} años, de junio de ${START.getFullYear()} a ${START.getFullYear()+a.years}. Instrumento: ${it.n} al ${pct(a.rate)}${a.cap?", con tope de "+mxn(a.cap):""}.`;
+
+  const K=[
+    ["hero","Saldo final después de ISR",mxn(s.bal),`Lo que habría en la cuenta al final.`],
+    ["","Valor en pesos de hoy",mxn(s.real),`Poder de compra, con inflación de ${pct(a.infl)}.`],
+    ["","Total depositado",mxn(s.contrib),`${mxn(a.P0)} al inicio y ${mxn(a.dep)} × ${s.n} meses.`],
+    ["","Intereses ganados",mxn(s.interest),`Antes de impuestos.`],
+    ["","Retención de ISR",mxn(-s.tax),`${pct(a.isr)} anual sobre el saldo arriba de ${mxn(a.exempt)}.`],
+    ["","Ganancia real",mxn(realGain),`Intereses netos menos lo que se comió la inflación (${mxn(s.erosion)}).`],
+  ];
+  $("kpis").innerHTML=K.map(([c,l,v,d])=>`<div class="stat ${c}"><dt>${l}</dt><dd><span class="v">${v}</span><span class="d">${d}</span></dd></div>`).join("");
+  $("recon").textContent=`Sin retención de ISR, el saldo final sería ${mxn(gross.bal)}.`;
+  // Same numbers, short labels, for the compact bar (ordered by importance: phones show the first two)
+  const KB=[["hero","Saldo final",mxn(s.bal)],["","En pesos de hoy",mxn(s.real)],["","Depositado",mxn(s.contrib)],
+    ["","Intereses",mxn(s.interest)],["","Retención ISR",mxn(-s.tax)],["","Ganancia real",mxn(realGain)]];
+  $("kpiBarList").innerHTML=KB.map(([c,l,v])=>`<div class="${c}"><dt>${l}</dt><dd>${v}</dd></div>`).join("");
+
+  // composition
+  const cP=s.contrib/s.bal*100, iP=Math.max(0,100-cP);
+  $("compSub").textContent=`Saldo final de ${mxn(s.bal)}.`;
+  $("compBar").innerHTML=`<div style="width:${cP}%;background:var(--c-contrib)"></div><div style="width:${iP}%;background:var(--c-interest)"></div>`;
+  $("compRows").innerHTML=[
+    ["Depósito inicial",mxn(a.P0)],["Depósitos mensuales",mxn(s.contrib-a.P0)],["Intereses ganados",mxn(s.interest)],
+    ["Retención de ISR",mxn(-s.tax),true],["Pérdida por inflación",mxn(-s.erosion),true],["Tasa real anual",pct(realRate(a.rate,a.infl))]
+  ].map(([k,v,n])=>`<div><dt>${k}</dt><dd class="${n?'neg':''}">${v}</dd></div>`).join("");
+
+  // scenarios
+  const sc=[["Bajo",a.low],["Base",a.rate],["Alto",a.high]].map(([l,r])=>({l,r,s:simulate({...a,rate:r})}));
+  $("scen").innerHTML=sc.map(x=>`<div class="${x.l==="Base"?"base":""}"><h3>Escenario ${x.l.toLowerCase()} · ${pct(x.r)}</h3><span class="v">${mxn(x.s.bal)}</span><span class="muted">${mxn(x.s.real)} en pesos de hoy</span></div>`).join("");
+
+  // strategies
+  const ST=[
+    {t:"Solo Mifel (con tope)",tag:"Plan actual",d:"Arriba de $500,000 el dinero deja de generar intereses.",s:simulate({...a,rate:.10,cap:500000}),risk:"1 · Muy bajo"},
+    {t:"Mifel + Now bank (7.5%)",tag:"Mejor equilibrio",d:"Hasta $500,000 en Mifel; el excedente en un segundo banco con IPAB.",s:simulate({...a,rate:.10,cap:500000,spill:.075}),risk:"1 · Muy bajo",best:true},
+    {t:"Mifel + CETES (6.25%)",tag:"Muy seguro",d:"Hasta $500,000 en Mifel; el excedente en CETES del Gobierno federal.",s:simulate({...a,rate:.10,cap:500000,spill:.0625}),risk:"1 · Muy bajo"},
+    {t:"Todo en CETES (6.25%)",tag:"Lo más seguro",d:"Sin límites de garantía; tasa más baja y puede cambiar en cada subasta.",s:simulate({...a,rate:.0625,cap:null}),risk:"1 · Muy bajo"},
+  ];
+  $("strat").innerHTML=ST.map(x=>`<div class="${x.best?"base":""}"><p class="eyebrow" style="margin:0">${x.tag}</p><h3>${x.t}</h3><span class="v">${mxn(x.s.bal)}</span><span class="muted">${mxn(x.s.real)} en pesos de hoy · riesgo ${x.risk}</span><p class="small muted">${x.d}</p></div>`).join("");
+
+  // instruments (each with its own cap if enabled, same tax)
+  const rows=INSTRUMENTS.map(x=>{const sim=simulate({...a,rate:x.r,cap:$("inCap").checked&&x.cap?x.cap:null});return {...x,s:sim,risk:riskOf(x,sim.bal)};}).sort((p,q)=>q.r-p.r);
+  const lim=x=>{const u=rateUpto(x),l=limitOf(x),bal=x.s.bal;
+    const warn=u!==null&&u!==Infinity&&bal>u?`<span class="sub warn-t">Tu saldo final (${short(bal)}) lo rebasa</span>`:"";
+    return `<td data-v="${u===null?-1:u===Infinity?1e15:u}">${l.txt}${warn}</td>`;};
+  $("instTbl").innerHTML=`<thead><tr><th scope="col">Instrumento</th><th scope="col">Tasa</th><th scope="col">Tasa real</th><th scope="col">Saldo final</th><th scope="col">Genera rendimiento hasta</th><th scope="col">Protección</th><th scope="col">Riesgo</th><th scope="col">Requisito</th><th scope="col">Fuente</th></tr></thead><tbody>`+
+    rows.map(x=>`<tr class="${x.n===it.n?'sel':''}" data-prot="${x.prot}" data-kind="${x.kind}"><td data-v="${x.n}">${x.n}${x.kind==="hist"?" *":""}<span class="sub">${x.cat}</span></td>`+
+      `<td data-v="${x.r}">${pct(x.r)}<span class="sub">${x.kind==="hist"?"Rendimiento 1 año (jun-2026)":"Anunciada"}</span></td>`+
+      `<td data-v="${realRate(x.r,a.infl)}" class="${realRate(x.r,a.infl)<0?'neg':''}">${pct(realRate(x.r,a.infl))}</td>`+
+      `<td data-v="${x.s.bal}">${mxn(x.s.bal)}<span class="sub">${mxn(x.s.real)} en pesos de hoy</span></td>`+
+      lim(x)+
+      `<td data-v="${coverOf(x)===Infinity?1e15:coverOf(x)}"><span class="tag" style="color:${protColor(x.prot)}">${protLabel(x.prot)}</span><span class="sub">${coverTxt(x)}</span></td>`+
+      `<td data-v="${x.risk.score}"><span class="risk r${x.risk.score}">${x.risk.score} · ${RISK_LBL[x.risk.score]}</span><span class="sub">${x.risk.rating}${x.risk.est?" † estimada":" publicada"}</span><details class="why"><summary>¿Por qué?</summary>${x.risk.why}</details></td>`+
+      `<td>${x.req??"—"}</td><td class="src-cell">${srcOf(x)}</td></tr>`).join("")+`</tbody>`;
+  labelStack($("instTbl")); refreshTable($("instTbl"));
+  LAST={a,s,it,sc,ST,rows,realGain,gross};
+  const sr=riskOf(it,s.bal);
+  // Intro sentence follows the inputs
+  const yrs=a.years===1?"1 año":`${a.years} años`;
+  $("lead").textContent=`Cuánto crecerá el ahorro si se invierten ${mxn(a.P0)} al inicio y ${mxn(a.dep)} cada mes durante ${yrs} en ${it.n} (${pct(a.rate)} anual), cuánto se lleva la inflación (${pct(a.infl)}) y cuánto se retiene de impuestos.`;
+  // Cap note and sources follow the selected instrument
+  const off=officialOf(it);
+  $("capHint").textContent=it.cap
+    ? `En ${it.n}, el saldo arriba de ${mxn(it.cap)} no genera intereses.`
+    : `${it.n} no tiene un tope de rendimiento registrado; esta casilla no cambia el resultado.`;
+  $("capSrc").innerHTML="Fuentes: "+(off?LNK(off[0],off[1])+" · ":"")+srcData(it)+".";
+  $("riskNow").innerHTML=`<b>${it.n}:</b> calificación ${sr.rating}${sr.est?" (estimada)":" (publicada)"} · riesgo global <b>${sr.score} de 5, ${RISK_LBL[sr.score].toLowerCase()}</b>. ${sr.why}`;
+
+  // annual table
+  $("yearTbl").innerHTML=`<thead><tr><th scope="col">Año</th><th scope="col">Depósitos</th><th scope="col">Intereses</th><th scope="col">Retención ISR</th><th scope="col">Pérdida por inflación</th><th scope="col">Saldo al cierre</th><th scope="col">En pesos de hoy</th></tr></thead><tbody>`+
+    s.yearly.map(y=>`<tr><td data-v="${y.year}">${y.year} <span class="sub">${START.getFullYear()+y.year}</span></td><td data-v="${y.yC}">${mxn(y.yC)}</td><td data-v="${y.yI}">${mxn(y.yI)}</td><td data-v="${-y.yT}" class="neg">${mxn(-y.yT)}</td><td data-v="${-y.yE}" class="neg">${mxn(-y.yE)}</td><td data-v="${y.bal}"><b>${mxn(y.bal)}</b></td><td data-v="${y.real}">${mxn(y.real)}</td></tr>`).join("")+
+    `</tbody><tfoot><tr><td>Total</td><td>${mxn(s.contrib-a.P0)}</td><td>${mxn(s.interest)}</td><td class="neg">${mxn(-s.tax)}</td><td class="neg">${mxn(-s.erosion)}</td><td>${mxn(s.bal)}</td><td>${mxn(s.real)}</td></tr></tfoot>`;
+
+  labelStack($("yearTbl")); refreshTable($("yearTbl"));
+  drawGrowth(s,sc); drawInst(rows,a.infl,it.n); drawLimits(rows,s.bal); drawQuad(rows,a,it.n);
+}
+
+// ---------- Tables: sort by header, filter, and switch to cards when they don't fit ----------
+// State lives on each table (data-sort-col / data-sort-dir) so it survives re-renders.
+const TABLE_TOOLS={}; // id -> {search, filters:[{key,label,options:[[value,label]]}]}
+function refreshTable(t){
+  decorateHeaders(t); applySort(t); applyFilters(t); fitTable(t); syncTools(t);
+}
+function decorateHeaders(t){
+  t.querySelectorAll("thead th").forEach((th,i)=>{
+    if(th.querySelector("button.sort")) return;
+    const label=th.textContent.trim();
+    th.innerHTML=`<button type="button" class="sort" data-col="${i}" aria-label="Ordenar por ${label}">${label}<span class="arr" aria-hidden="true"></span></button>`;
+  });
+  const col=t.dataset.sortCol, dir=t.dataset.sortDir;
+  t.querySelectorAll("thead th").forEach((th,i)=>th.setAttribute("aria-sort",String(i)===col?(dir==="desc"?"descending":"ascending"):"none"));
+}
+const cellVal=c=>{if(!c)return "";const v=c.dataset.v??c.textContent.trim();const n=Number(v);return v!==""&&!isNaN(n)?n:v.toLowerCase();};
+function applySort(t){
+  const col=t.dataset.sortCol; if(col===undefined) return;
+  const dir=t.dataset.sortDir==="desc"?-1:1, tb=t.tBodies[0];
+  [...tb.rows].sort((a,b)=>{const x=cellVal(a.cells[col]),y=cellVal(b.cells[col]);
+    return (typeof x==="number"&&typeof y==="number"?x-y:String(x).localeCompare(String(y),"es"))*dir;})
+    .forEach(r=>tb.appendChild(r));
+}
+function setSort(t,col,dir){
+  if(dir===undefined) dir=(t.dataset.sortCol===String(col)&&t.dataset.sortDir!=="desc")?"desc":"asc";
+  t.dataset.sortCol=String(col); t.dataset.sortDir=dir; refreshTable(t);
+}
+function applyFilters(t){
+  const cfg=TABLE_TOOLS[t.id]; if(!cfg) return;
+  const box=document.querySelector(`.tbl-tools[data-for="${t.id}"]`); if(!box) return;
+  const q=(box.querySelector("input[type=search]")?.value||"").trim().toLowerCase();
+  const sel=[...box.querySelectorAll("select[data-key]")].map(x=>[x.dataset.key,x.value]);
+  let shown=0; const rows=[...t.tBodies[0].rows];
+  rows.forEach(r=>{const ok=(!q||r.textContent.toLowerCase().includes(q))&&sel.every(([k,v])=>!v||r.dataset[k]===v);
+    r.hidden=!ok; if(ok) shown++;});
+  const c=box.querySelector(".count"); if(c) c.textContent=`Mostrando ${shown} de ${rows.length}`;
+}
+// Cards whenever the full table is wider than its space (any window size, any text size).
+function fitTable(t){
+  const wrap=t.closest(".tscroll"); if(!wrap||matchMedia("print").matches) return;
+  t.classList.remove("cards");
+  if(t.scrollWidth>wrap.clientWidth+2) t.classList.add("cards");
+  // Sort menu only when headers are hidden (cards); in table mode the clickable headers do the job.
+  document.querySelector(`.tbl-tools[data-for="${t.id}"]`)?.classList.toggle("cards-mode",t.classList.contains("cards"));
+}
+function buildTools(t){
+  const cfg=TABLE_TOOLS[t.id]; if(!cfg||document.querySelector(`.tbl-tools[data-for="${t.id}"]`)) return;
+  const box=document.createElement("div"); box.className="tbl-tools"; box.dataset.for=t.id;
+  const uid=t.id;
+  let html="";
+  if(cfg.search) html+=`<div><label for="${uid}-q">Buscar</label><input type="search" id="${uid}-q" name="${uid}-q" placeholder="Nombre, tipo…" autocomplete="off"></div>`;
+  (cfg.filters||[]).forEach(f=>{html+=`<div><label for="${uid}-${f.key}">${f.label}</label><span class="select"><select id="${uid}-${f.key}" name="${uid}-${f.key}" data-key="${f.key}"><option value="">Todos</option>${f.options.map(([v,l])=>`<option value="${v}">${l}</option>`).join("")}</select><svg viewBox="0 0 8 5" width="12" height="8" fill="none" aria-hidden="true"><path d="M.5.5 4 4 7.5.5" stroke="currentColor" stroke-width="1.2"/></svg></span></div>`;});
+  html+=`<div class="sort-ctl"><label for="${uid}-sort">Ordenar por</label><span class="select"><select id="${uid}-sort" name="${uid}-sort" class="sort-sel"></select><svg viewBox="0 0 8 5" width="12" height="8" fill="none" aria-hidden="true"><path d="M.5.5 4 4 7.5.5" stroke="currentColor" stroke-width="1.2"/></svg></span></div>`;
+  html+=`<div class="sort-ctl"><span class="lbl-spacer" aria-hidden="true"> </span><button type="button" class="btn-secondary dir">Ascendente ↑</button></div>`;
+  if(cfg.search||cfg.filters) html+=`<p class="count small muted" aria-live="polite"></p>`;
+  box.innerHTML=html;
+  if(!cfg.search&&!cfg.filters) box.classList.add("sort-only");
+  t.closest(".tscroll").before(box);
+  box.addEventListener("input",e=>{if(e.target.matches("input[type=search],select[data-key]")) refreshTable(t);});
+  box.querySelector(".sort-sel").addEventListener("change",e=>{
+    if(e.target.value===""){delete t.dataset.sortCol;delete t.dataset.sortDir;[...t.tBodies[0].rows].sort((a,b)=>a.dataset.i-b.dataset.i).forEach(r=>t.tBodies[0].appendChild(r));refreshTable(t);}
+    else setSort(t,e.target.value,t.dataset.sortDir||"asc");});
+  box.querySelector(".dir").addEventListener("click",()=>{if(t.dataset.sortCol===undefined)t.dataset.sortCol="0";setSort(t,t.dataset.sortCol,t.dataset.sortDir==="desc"?"asc":"desc");});
+  new ResizeObserver(()=>fitTable(t)).observe(t.closest(".tscroll"));
+}
+function syncTools(t){
+  const box=document.querySelector(`.tbl-tools[data-for="${t.id}"]`); if(!box) return;
+  const heads=[...t.querySelectorAll("thead th")].map(th=>th.textContent.trim());
+  const ss=box.querySelector(".sort-sel");
+  if(ss.options.length!==heads.length+1) ss.innerHTML=`<option value="">Orden original</option>`+heads.map((h,i)=>`<option value="${i}">${h}</option>`).join("");
+  ss.value=t.dataset.sortCol??"";
+  box.querySelector(".dir").textContent=t.dataset.sortDir==="desc"?"Descendente ↓":"Ascendente ↑";
+}
+document.addEventListener("click",e=>{const b=e.target.closest("button.sort"); if(!b) return; setSort(b.closest("table"),b.dataset.col);});
+
+// ---------- charts (font sizes follow the page size) ----------
+const base=()=>parseFloat(getComputedStyle(document.documentElement).fontSize);
+function common(){
+  const b=base(); Chart.defaults.font.family="Inter, system-ui, sans-serif"; Chart.defaults.font.size=Math.round(b*.85); Chart.defaults.color=css("--ink");
+  Chart.defaults.animation.duration=(NOANIM||matchMedia("(prefers-reduced-motion: reduce)").matches)?0:300;
+  return b;
+}
+function drawGrowth(s,sc){
+  const b=common(); $("growthBox").style.height=Math.max(22*b,320)+"px";
+  const nw=narrow(), line=css("--line"), lbl=s.yearly.map(y=>nw?`${y.year}`:`Año ${y.year}`);
+  const data={labels:lbl,datasets:[
+    // Chart.js draws higher "order" first, so the line (order 0) is painted on top of the bars (order 1)
+    {type:"line",label:"En pesos de hoy",order:0,data:s.yearly.map(y=>y.real),borderColor:css("--c-real"),backgroundColor:css("--bg"),
+      borderWidth:4,pointRadius:b*.35,pointHoverRadius:b*.5,pointBorderWidth:3,pointBorderColor:css("--c-real"),pointStyle:"rectRot"},
+    {type:"bar",label:"Depositado",order:1,data:s.yearly.map(y=>y.contrib),backgroundColor:css("--c-contrib"),stack:"s"},
+    {type:"bar",label:"Intereses netos",order:1,data:s.yearly.map(y=>y.bal-y.contrib),backgroundColor:css("--c-interest"),stack:"s"},
+  ]};
+  const opt={responsive:true,maintainAspectRatio:false,interaction:{mode:"index",intersect:false},
+    plugins:{legend:{position:"bottom",labels:{boxWidth:b*.9,boxHeight:b*.9,padding:nw?b*.6:b}},tooltip:{titleFont:{size:b},bodyFont:{size:b*.9},padding:b*.6,callbacks:{title:c=>`Año ${c[0].dataIndex+1}`,label:c=>` ${c.dataset.label}: ${mxn(c.parsed.y)}`}}},
+    scales:{x:{stacked:true,grid:{display:false},title:{display:nw,text:"Año del plan"},ticks:{maxRotation:0,autoSkip:true}},y:{stacked:true,grid:{color:line},border:{display:false},ticks:{callback:v=>short(v),maxTicksLimit:nw?6:10}}}};
+  if(gChart){gChart.data=data;gChart.options=opt;gChart.update();}else gChart=new Chart($("growth"),{data,options:opt});
+}
+const inflLine={id:"inflLine",afterDatasetsDraw(ch,_,o){
+  const x=ch.scales.x.getPixelForValue(o.value*100),{top,bottom}=ch.chartArea,c=ch.ctx;
+  c.save();c.strokeStyle=o.color;c.setLineDash([6,5]);c.lineWidth=2.5;c.beginPath();c.moveTo(x,top);c.lineTo(x,bottom);c.stroke();
+  c.setLineDash([]);c.fillStyle=o.color;c.font=`700 ${Math.round(o.size)}px Inter`;c.fillText(`Inflación ${(o.value*100).toFixed(2)}%`,x+6,top-o.size*.5);c.restore();}};
+function hatch(color){
+  const p=document.createElement("canvas");p.width=p.height=10;const g=p.getContext("2d");
+  g.strokeStyle=color;g.lineWidth=3;g.beginPath();g.moveTo(-2,12);g.lineTo(12,-2);g.stroke();return g.createPattern(p,"repeat");
+}
+function drawInst(rows,infl,selName){
+  const b=common(), nw=narrow(); $("instBox").style.height=Math.max(rows.length*b*(nw?2:2.2)+b*4,420)+"px";
+  const shortName=n=>nw&&n.length>16?n.slice(0,15).trimEnd()+"…":n;
+  const data={labels:rows.map(r=>shortName(r.n)+(r.kind==="hist"?" *":"")),datasets:[{label:"Tasa anual",data:rows.map(r=>r.r*100),
+    backgroundColor:rows.map(r=>r.kind==="hist"?hatch(protColor(r.prot)):protColor(r.prot)),
+    borderColor:rows.map(r=>r.n===selName?css("--ink"):protColor(r.prot)),borderWidth:rows.map(r=>r.n===selName?3:r.kind==="hist"?2:0),borderRadius:3}]};
+  const opt={indexAxis:"y",responsive:true,maintainAspectRatio:false,animations:{colors:false},
+    onClick:(e,els)=>{if(!els.length)return;const o=officialOf(rows[els[0].index]);if(o)window.open(o[0],"_blank","noopener");},
+    onHover:(e,els)=>{e.native.target.style.cursor=els.length&&officialOf(rows[els[0].index])?"pointer":"default";},layout:{padding:{top:b*1.4,right:nw?b*.5:b*2.5}},
+    plugins:{legend:{display:false},inflLine:{value:infl,color:css("--c-neg"),size:b*.8},
+      tooltip:{titleFont:{size:b},bodyFont:{size:b*.9},padding:b*.6,callbacks:{footer:c=>officialOf(rows[c[0].dataIndex])?"Clic en la barra: abrir sitio oficial":"",title:c=>rows[c[0].dataIndex].n,label:c=>{const r=rows[c.dataIndex];return [` Tasa: ${pct(r.r)} (${r.kind==="hist"?"rendimiento pasado":"anunciada"})`,` Saldo final: ${mxn(r.s.bal)}`,` Riesgo: ${r.risk.score} · ${RISK_LBL[r.risk.score]} (${r.risk.rating}${r.risk.est?" estimada":""})`];}}}},
+    scales:{x:{min:0,grid:{color:css("--line")},border:{display:false},ticks:{callback:v=>v+"%"}},y:{grid:{display:false},ticks:{autoSkip:false,font:{weight:500}}}}};
+  if(iChart){iChart.data=data;iChart.options=opt;iChart.update();}else iChart=new Chart($("inst"),{type:"bar",data,options:opt,plugins:[inflLine]});
+}
+
+// Limits chart: how much of the balance earns the rate, and how much is insured (log scale).
+let lChart;
+const finalLine={id:"finalLine",afterDatasetsDraw(ch,_,o){
+  const x=ch.scales.x.getPixelForValue(o.value),{top,bottom}=ch.chartArea,c=ch.ctx;
+  c.save();c.strokeStyle=o.color;c.setLineDash([6,5]);c.lineWidth=2.5;c.beginPath();c.moveTo(x,top);c.lineTo(x,bottom);c.stroke();
+  c.setLineDash([]);c.fillStyle=o.color;c.font=`700 ${Math.round(o.size)}px Inter`;c.textAlign=x>ch.chartArea.right-160?"right":"left";
+  c.fillText(`Tu saldo final ${short(o.value)}`,x+(c.textAlign==="right"?-6:6),top-o.size*.5);c.restore();}};
+function drawLimits(rows,finalBal){
+  const b=common(), nw=narrow(), MAX=1e7, MIN=1e4;
+  $("limBox").style.height=Math.max(rows.length*b*(nw?2.4:2.6)+b*5,460)+"px";
+  const shortName=n=>nw&&n.length>16?n.slice(0,15).trimEnd()+"…":n;
+  const rateV=rows.map(x=>{const u=rateUpto(x);return u===null?null:Math.min(u,MAX);});
+  const covV=rows.map(x=>{const c=coverOf(x);return c?Math.min(c,MAX):null;});
+  const cr=css("--c-real"), cc=css("--ipab");
+  const style=(vals,src,color)=>vals.map((v,i)=>src(rows[i])===Infinity?hatch(color):color);
+  const data={labels:rows.map(r=>shortName(r.n)),datasets:[
+    {label:"Saldo que genera rendimiento",data:rateV,backgroundColor:style(rateV,rateUpto,cr),borderColor:cr,borderWidth:rows.map(x=>rateUpto(x)===Infinity?2:0),borderRadius:3},
+    {label:"Saldo protegido por un seguro",data:covV,backgroundColor:style(covV,coverOf,cc),borderColor:cc,borderWidth:rows.map(x=>coverOf(x)===Infinity?2:0),borderRadius:3}]};
+  const fmt=(v,src)=>v===Infinity?"sin límite":v===null?"sin dato":v===0?"nada":mxn(v);
+  const opt={indexAxis:"y",responsive:true,maintainAspectRatio:false,animations:{colors:false},layout:{padding:{top:b*1.4,right:nw?b*.5:b*2}},
+    plugins:{legend:{display:false},finalLine:{value:Math.min(Math.max(finalBal,MIN),MAX),color:css("--c-neg"),size:b*.8},
+      tooltip:{titleFont:{size:b},bodyFont:{size:b*.9},padding:b*.6,callbacks:{title:c=>rows[c[0].dataIndex].n,
+        label:c=>{const x=rows[c.dataIndex];return c.datasetIndex===0?` Genera rendimiento hasta: ${fmt(rateUpto(x))} (${limitOf(x).txt})`:` Protegido: ${coverTxt(x)}`;}}}},
+    scales:{x:{type:"logarithmic",min:MIN,max:MAX,grid:{color:css("--line")},border:{display:false},
+      ticks:{maxRotation:0,autoSkip:false,callback:v=>(nw?[1e4,1e5,1e6,1e7]:[1e4,1e5,5e5,1e6,3.5e6,1e7]).includes(v)?short(v):""}},
+      y:{grid:{display:false},ticks:{autoSkip:false,font:{weight:500}}}}};
+  if(lChart){lChart.data=data;lChart.options=opt;lChart.update();}else lChart=new Chart($("limits"),{type:"bar",data,options:opt,plugins:[finalLine]});
+  // plain-language summary
+  const full=rows.filter(x=>{const u=rateUpto(x),c=coverOf(x);return u!==null&&u>=finalBal&&c>=finalBal;}).map(x=>x.n);
+  const capped=rows.filter(x=>{const u=rateUpto(x);return u!==null&&u!==Infinity&&u<finalBal;}).map(x=>x.n);
+  $("limSum").innerHTML=`Con un saldo final de <b>${mxn(finalBal)}</b>: <b>${full.length}</b> instrumentos generan rendimiento sobre todo el saldo <i>y</i> lo protegen completo (${full.join(", ")}). `+
+    (capped.length?`En <b>${capped.join(", ")}</b> una parte del saldo dejaría de generar rendimiento. `:"")+
+    `En las SOFIPOS solo ≈ $221 mil estarían protegidos, y los fondos de inversión no tienen seguro de depósito.`;
+}
+
+// ---------- Quadrant map (scatter) with selectable axes ----------
+const QUAD_METRICS={
+  risk:{label:"Riesgo global (1 = muy bajo, 5 = alto)",better:"low",discrete:true,get:x=>x.risk.score,fmt:v=>`${Math.round(v)} · ${RISK_LBL[Math.round(v)]||""}`,tick:v=>Number.isInteger(v)?`${v} · ${RISK_LBL[v]}`:""},
+  real:{label:"Tasa real (después de inflación)",better:"high",get:(x,a)=>realRate(x.r,a.infl)*100,fmt:v=>v.toFixed(2)+"%",tick:v=>v.toFixed(1)+"%"},
+  rate:{label:"Tasa anual",better:"high",get:x=>x.r*100,fmt:v=>v.toFixed(2)+"%",tick:v=>v.toFixed(1)+"%"},
+  bal:{label:"Saldo final después de ISR",better:"high",get:x=>x.s.bal,fmt:v=>mxn(v),tick:v=>short(v)},
+  realbal:{label:"Saldo en pesos de hoy",better:"high",get:x=>x.s.real,fmt:v=>mxn(v),tick:v=>short(v)},
+  cover:{label:"Saldo final protegido por un seguro (%)",better:"high",get:x=>Math.min(1,coverOf(x)/x.s.bal)*100,fmt:v=>Math.round(v)+"%",tick:v=>Math.round(v)+"%"},
+  limit:{label:"Saldo final que genera rendimiento (%)",better:"high",get:x=>{const u=rateUpto(x);return u===null?null:Math.min(1,u/x.s.bal)*100;},fmt:v=>Math.round(v)+"%",tick:v=>Math.round(v)+"%"},
+};
+let qChart;
+{const xs=$("quadX"),ys=$("quadY"),opts=Object.entries(QUAD_METRICS).map(([k,m])=>`<option value="${k}">${m.label}</option>`).join("");
+ xs.innerHTML=opts; ys.innerHTML=opts; xs.value="risk"; ys.value="real";
+ [xs,ys,$("quadNames")].forEach(el=>el.addEventListener("change",()=>LAST&&drawQuad(LAST.rows,LAST.a,LAST.it.n)));}
+const quadPlugin={id:"quadPlugin",
+  beforeDatasetsDraw(ch,_,o){const {left,right,top,bottom}=ch.chartArea,c=ch.ctx,X=ch.scales.x,Y=ch.scales.y;
+    const mx=X.getPixelForValue(o.mx), my=Y.getPixelForValue(o.my);
+    // shade the quadrant that is better on both axes
+    const bx=[mx,right], by=[top,my]; // axes are oriented so "better" is always right and up
+    c.save();c.globalAlpha=.12;c.fillStyle=o.shade;c.fillRect(bx[0],by[0],bx[1]-bx[0],by[1]-by[0]);c.globalAlpha=1;
+    c.strokeStyle=o.line;c.setLineDash([6,5]);c.lineWidth=2;c.beginPath();c.moveTo(mx,top);c.lineTo(mx,bottom);c.moveTo(left,my);c.lineTo(right,my);c.stroke();c.setLineDash([]);
+    c.font=`700 ${Math.round(o.size)}px Inter`;c.fillStyle=o.label;
+    const corner=(hx,hy,txt)=>{const x=hx==="high"?right-6:left+6,y=hy==="high"?top+o.size+4:bottom-8;c.textAlign=hx==="high"?"right":"left";c.fillText(txt,x,y);};
+    corner("high","high","★ Mejor en ambos");
+    corner("low","low","Peor en ambos");
+    c.restore();},
+  afterDatasetsDraw(ch,_,o){if(!o.names) return;
+    // Uncluttered labels: points that overlap share one label ("Name +N"); each label tries 8 spots
+    // around its point and skips any spot that covers a point, another label or the chart edge.
+    const c=ch.ctx,meta=ch.getDatasetMeta(0),A=ch.chartArea,raw=ch.data.datasets[0].data,fs=Math.round(o.size*.85),R=o.size*.75;
+    const pts=meta.data.map((p,i)=>raw[i]?{x:p.x,y:p.y,i,r:raw[i]}:null).filter(Boolean);
+    const clusters=[]; pts.forEach(p=>{const cl=clusters.find(k=>Math.hypot(k.x-p.x,k.y-p.y)<R*1.6); if(cl){cl.m.push(p);}else clusters.push({x:p.x,y:p.y,m:[p]});});
+    const prio=k=>(k.m.some(p=>p.r.n===o.sel)?0:1)*10+(k.m.some(p=>p.r.best)?0:1);
+    clusters.sort((a,b)=>prio(a)-prio(b));
+    const boxes=[], dots=pts.map(p=>[p.x-R,p.y-R,p.x+R,p.y+R]);
+    const hit=(b,list)=>list.some(d=>!(b[2]<d[0]||b[0]>d[2]||b[3]<d[1]||b[1]>d[3]));
+    c.save();c.font=`600 ${fs}px Inter`;c.textBaseline="middle";c.lineJoin="round";
+    clusters.forEach(k=>{
+      const first=k.m.find(p=>p.r.n===o.sel)||k.m[0]; let t=first.r.n; if(t.length>(o.narrow?14:20)) t=t.slice(0,o.narrow?13:19).trimEnd()+"…";
+      if(k.m.length>1) t+=` +${k.m.length-1}`;
+      const w=c.measureText(t).width,h=fs*1.2,g=R+4;
+      const spots=[[g,-h/2],[-g-w,-h/2],[-w/2,-g-h],[-w/2,g],[g,-g-h*.6],[-g-w,-g-h*.6],[g,g*.4],[-g-w,g*.4]];
+      for(const [dx,dy] of spots){const b=[k.x+dx,k.y+dy,k.x+dx+w,k.y+dy+h];
+        if(b[0]<A.left+2||b[2]>A.right-2||b[1]<A.top+2||b[3]>A.bottom-2) continue;
+        if(hit(b,boxes)||hit(b,dots)) continue;
+        boxes.push(b);k.done=true;
+        c.strokeStyle=o.halo;c.lineWidth=4;c.strokeText(t,b[0],b[1]+h/2);c.fillStyle=o.text;c.fillText(t,b[0],b[1]+h/2);break;}
+      // the selected instrument and best-quadrant points always get a label: place it left of the point, kept inside the chart
+      if(!k.done&&prio(k)<11){const x=Math.max(A.left+2,Math.min(k.x-g-w,A.right-w-2)),y=Math.max(A.top+2,Math.min(k.y-g-h,A.bottom-h-2));
+        boxes.push([x,y,x+w,y+h]);c.strokeStyle=o.halo;c.lineWidth=4;c.strokeText(t,x,y+h/2);c.fillStyle=o.text;c.fillText(t,x,y+h/2);}
+    });
+    c.restore();}};
+function drawQuad(rows,a,selName){
+  const b=common(), nw=narrow(), kx=$("quadX").value, ky=$("quadY").value, MX=QUAD_METRICS[kx], MY=QUAD_METRICS[ky];
+  $("quadBox").style.height=Math.max(26*b,nw?380:460)+"px";
+  // small, deterministic spread for discrete axes so overlapping points stay visible
+  const spread=(vals,m)=>{if(!m.discrete) return vals;const seen={};return vals.map(v=>{if(v===null) return v;seen[v]=(seen[v]||0)+1;const k=seen[v]-1;return v+((k%5)-2)*.07;});};
+  const rx=rows.map(x=>MX.get(x,a)), ry=rows.map(x=>MY.get(x,a));
+  const xs=spread(rx,MX), ys=spread(ry,MY);
+  const pts=rows.map((x,i)=>rx[i]===null||ry[i]===null?null:{x:xs[i],y:ys[i],n:x.n,rx:rx[i],ry:ry[i],row:x});
+  const valid=pts.filter(Boolean), mid=arr=>(Math.min(...arr)+Math.max(...arr))/2;
+  const mxv=mid(valid.map(p=>p.rx)), myv=mid(valid.map(p=>p.ry));
+  const isGood=(v,m,midv)=>m.better==="high"?v>midv:v<midv;
+  valid.forEach(p=>{p.best=isGood(p.rx,MX,mxv)&&isGood(p.ry,MY,myv);});
+  const pad=(arr,m)=>{const lo=Math.min(...arr),hi=Math.max(...arr),d=(hi-lo)||1;return m.discrete?[lo-.5,hi+.5]:[lo-d*.08,hi+d*.08];};
+  const [x0,x1]=pad(valid.map(p=>p.rx),MX), [y0,y1]=pad(valid.map(p=>p.ry),MY);
+  const data={datasets:[{data:pts,
+    backgroundColor:pts.map(p=>p?protColor(p.row.prot):"transparent"),
+    borderColor:pts.map(p=>p&&p.n===selName?css("--ink"):css("--bg")),borderWidth:pts.map(p=>p&&p.n===selName?3:1.5),
+    pointStyle:pts.map(p=>p&&p.row.kind==="hist"?"rectRot":"circle"),
+    pointRadius:pts.map(p=>p&&p.n===selName?b*.6:b*.45),pointHoverRadius:b*.7}]};
+  const opt={responsive:true,maintainAspectRatio:false,animations:{colors:false},layout:{padding:{top:b*.5,right:b}},interaction:{mode:"point",intersect:true},
+    plugins:{legend:{display:false},
+      quadPlugin:{mx:mxv,my:myv,xb:MX.better,yb:MY.better,shade:css("--c-interest"),line:css("--ink-2"),label:css("--c-interest"),text:css("--ink"),halo:css("--bg"),size:b*.8,names:$("quadNames").checked,sel:selName,narrow:nw},
+      tooltip:{titleFont:{size:b},bodyFont:{size:b*.9},padding:b*.6,callbacks:{title:c=>c.map(x=>x.raw.n).join(" · "),
+        label:c=>[` ${MX.label}: ${MX.fmt(c.raw.rx)}`,` ${MY.label}: ${MY.fmt(c.raw.ry)}`,` Protección: ${protLabel(c.raw.row.prot)}`]}}},
+    scales:{x:{type:"linear",reverse:MX.better==="low",min:x0,max:x1,title:{display:true,text:MX.label+"  mejor →",font:{weight:600}},grid:{color:css("--line")},border:{display:false},afterBuildTicks:ax=>{if(MX.discrete)ax.ticks=[1,2,3,4,5].filter(v=>v>=ax.min&&v<=ax.max).map(v=>({value:v}));},ticks:{callback:v=>nw&&MX.discrete?(Number.isInteger(v)?String(v):""):MX.tick(v),maxRotation:0,includeBounds:false,maxTicksLimit:nw?5:8}},
+      y:{type:"linear",reverse:MY.better==="low",min:y0,max:y1,title:{display:true,text:MY.label+"  ↑ mejor",font:{weight:600}},grid:{color:css("--line")},border:{display:false},afterBuildTicks:ax=>{if(MY.discrete)ax.ticks=[1,2,3,4,5].filter(v=>v>=ax.min&&v<=ax.max).map(v=>({value:v}));},ticks:{callback:v=>nw&&MY.discrete?(Number.isInteger(v)?String(v):""):MY.tick(v),includeBounds:false,maxTicksLimit:nw?6:8}}}};
+  if(qChart){qChart.data=data;qChart.options=opt;qChart.update();}else qChart=new Chart($("quad"),{type:"scatter",data,options:opt,plugins:[quadPlugin]});
+  // plain-language summary of the best quadrant
+  const good=(v,m,midv)=>m.better==="high"?v>midv:v<midv;
+  const best=valid.filter(p=>good(p.rx,MX,mxv)&&good(p.ry,MY,myv)).map(p=>p.n);
+  const missing=pts.map((p,i)=>p?null:rows[i].n).filter(Boolean);
+  $("quadSum").innerHTML=`<b>Mejor en ambos ejes</b> (${MX.label} y ${MY.label}): `+
+    (best.length?`<b>${best.join(", ")}</b>.`:"ningún instrumento queda en ese cuadrante con estos ejes.")+
+    (missing.length?` Sin dato para este eje: ${missing.join(", ")}.`:"");
+}
+
+// ---------- font size controls ----------
+const STEPS=[.9,1,1.15,1.3,1.5,1.75,2];
+let fi=1; try{const v=+localStorage.getItem("fondo-font");if(STEPS.includes(v))fi=STEPS.indexOf(v);}catch(e){}
+function applyFont(){
+  document.documentElement.style.setProperty("--scale",STEPS[fi]);
+  $("fsPct").textContent=Math.round(STEPS[fi]*100)+"%";
+  $("fsDown").disabled=fi===0; $("fsUp").disabled=fi===STEPS.length-1;
+  try{localStorage.setItem("fondo-font",STEPS[fi]);}catch(e){}
+  render();
+}
+// ---------- Saving files ----------
+// On claude.ai the page runs inside a viewer that only lets it hand files over through the
+// `downloads` capability (the viewer confirms each save). Anywhere else (GitHub Pages, a saved
+// copy) window.claude does not exist and a normal browser download is used.
+let dlPromise=null;
+const getDownloads=()=>dlPromise??=(window.claude&&typeof window.claude.use==="function"?window.claude.use("downloads").catch(()=>null):Promise.resolve(null));
+async function saveFile(filename,blob){
+  if(window.__noDownload) return "saved";
+  const dl=await getDownloads();
+  if(dl){
+    try{await dl.save({filename,data:blob});return "saved";}
+    catch(e){
+      if(e&&e.code==="declined") return "declined";
+      if(e&&e.code==="rate_limited") return "busy";
+      if(e&&e.code==="too_large") return "too_large";
+      // any other code: fall through to a plain browser download
+    }
+  }
+  const url=URL.createObjectURL(blob), a=document.createElement("a");
+  a.href=url; a.download=filename; document.body.appendChild(a); a.click(); a.remove();
+  setTimeout(()=>URL.revokeObjectURL(url),4000);
+  return "saved";
+}
+const SAVE_MSG={declined:"Descarga cancelada.",busy:"Hay otra descarga en curso; inténtalo en unos segundos.",too_large:"El archivo es demasiado grande para guardarlo aquí."};
+
+// ---------- PDF export (jsPDF + AutoTable, loaded only when the button is pressed) ----------
+const PDF_LIBS=["https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js",
+  "https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.8.2/jspdf.plugin.autotable.min.js"];
+const loadScript=src=>new Promise((ok,ko)=>{if([...document.scripts].some(s=>s.src===src))return ok();
+  const s=document.createElement("script");s.src=src;s.onload=ok;s.onerror=()=>ko(new Error("No se pudo cargar "+src));document.head.appendChild(s);});
+// The standard PDF font has no glyphs for some symbols used on screen; swap them for plain equivalents.
+const P=t=>String(t).replace(/−/g,"-").replace(/≈/g,"aprox. ").replace(/[↗▶]/g,"").replace(/ | /g," ").trim();
+const SOURCES=[
+  ["Inflación 3.62% (INEGI, 1a quincena oct-2026)","https://www.inegi.org.mx/contenidos/saladeprensa/boletines/2026/inpc/inpc_1q2026_10.pdf"],
+  ["Cuenta Digital Mifel: 10% hasta $500,000 (términos)","https://mifel-public-assets.s3.us-east-1.amazonaws.com/d/tyc-cuenta-digital-mifel.pdf"],
+  ["Tasa Mifel verificada (Tasas.mx)","https://www.tasas.mx/institucion/mifel"],
+  ["Retención ISR 0.90% 2026 (LIF art. 24)","https://siemprealdia.co/mexico/fiscal/retencion-de-isr-en-intereses-bancarios/"],
+  ["Saldo exento 5 UMA (IDC)","https://idconline.mx/fiscal-contable/2026/10/27/isr-por-intereses-2027-cuando-si-te-convendra-declarar"],
+  ["Tasa objetivo Banxico 6.25% (anuncio 5-nov-2026)","https://www.banxico.org.mx/publicaciones-y-prensa/anuncios-de-las-decisiones-de-politica-monetaria/%7B43236252-D06E-5231-27E8-058810A86A52%7D.pdf"],
+  ["IPAB","https://www.ipab.org.mx"],["PROSOFIPO","https://www.prosofipo.mx"],["cetesdirecto","https://www.cetesdirecto.com"],["Banxico (UDI)","https://www.banxico.org.mx"],
+];
+// Wait for the charts to repaint; the timer covers background tabs, where animation frames never fire.
+const nextFrame=()=>new Promise(r=>{let done=false;const f=()=>{if(!done){done=true;r();}};
+  requestAnimationFrame(()=>requestAnimationFrame(f));setTimeout(f,120);});
+async function captureCharts(){
+  // Charts are captured in the light theme with no animation so they print cleanly on white paper.
+  const html=document.documentElement, prevTheme=html.getAttribute("data-theme");
+  NOANIM=true; html.setAttribute("data-theme","light"); render(); await nextFrame();
+  // Draw synchronously: Chart.js otherwise waits for animation frames, which never arrive in background tabs.
+  for(const ch of [gChart,iChart]){ch.update("none");ch.draw();}
+  // Downscale to ≤1600 px wide and use JPEG: keeps the PDF small without visible loss at print size.
+  const grab=ch=>{const k=Math.min(1,1600/ch.canvas.width),c=document.createElement("canvas");
+    c.width=Math.round(ch.canvas.width*k);c.height=Math.round(ch.canvas.height*k);
+    const g=c.getContext("2d");g.fillStyle="#ffffff";g.fillRect(0,0,c.width,c.height);g.drawImage(ch.canvas,0,0,c.width,c.height);
+    return {url:c.toDataURL("image/jpeg",.9),ratio:c.height/c.width};};
+  const out={growth:grab(gChart),inst:grab(iChart)};
+  html.setAttribute("data-theme",prevTheme); render(); NOANIM=false;
+  return out;
+}
+async function exportPDF(){
+  const btn=$("btnPdf"), st=$("pdfStatus"), label=btn.textContent;
+  btn.disabled=true; btn.textContent="Generando PDF…"; st.textContent="Preparando el reporte…";
+  try{
+    for(const u of PDF_LIBS) await loadScript(u);
+    const imgs=await captureCharts();
+    const {a,s,it,sc,ST,rows,realGain,gross}=LAST;
+    const doc=new window.jspdf.jsPDF({unit:"pt",format:"letter",compress:true});
+    const W=doc.internal.pageSize.getWidth(), H=doc.internal.pageSize.getHeight(), M=44, CW=W-2*M;
+    const GREEN=[11,92,74], INK=[17,17,17], GRAY=[70,70,66];
+    let y=M;
+    const need=h=>{if(y+h>H-M){doc.addPage();y=M;}};
+    const h2=(t,keep=40)=>{need(keep);doc.setFont("helvetica","bold");doc.setFontSize(14);doc.setTextColor(...INK);doc.text(P(t),M,y+14);y+=26;};
+    const para=(t,size=10)=>{doc.setFont("helvetica","normal");doc.setFontSize(size);doc.setTextColor(...GRAY);
+      const lines=doc.splitTextToSize(P(t),CW);need(lines.length*size*1.35);doc.text(lines,M,y+size);y+=lines.length*size*1.35+6;};
+    const table=(head,body,opts={})=>{doc.autoTable({startY:y,head:[head.map(P)],body:body.map(r=>r.map(P)),margin:{left:M,right:M},
+      styles:{font:"helvetica",fontSize:9.5,cellPadding:4,textColor:INK,lineColor:[220,220,215],lineWidth:.5},
+      headStyles:{fillColor:GREEN,textColor:255,fontStyle:"bold"},alternateRowStyles:{fillColor:[246,246,243]},...opts});
+      y=doc.lastAutoTable.finalY+16;};
+    const image=(img,maxH)=>{let w=CW,h=w*img.ratio;if(h>maxH){h=maxH;w=h/img.ratio;}need(h+8);doc.addImage(img.url,"JPEG",M+(CW-w)/2,y,w,h);y+=h+14;};
+    const today=new Date().toLocaleDateString("es-MX",{day:"numeric",month:"long",year:"numeric"});
+
+    // Title
+    doc.setFont("helvetica","bold");doc.setFontSize(22);doc.setTextColor(...GREEN);doc.text("Fondo de Ahorro",M,y+20);y+=30;
+    para(`Reporte del modelo económico · generado el ${today} · datos actualizados a noviembre de 2026.`,10.5);
+    para("Resumen informativo, no es una recomendación de un asesor financiero.",9);
+
+    h2("Supuestos");
+    table(["Concepto","Valor"],[
+      ["Inversión inicial",mxn(a.P0)],["Depósito mensual",mxn(a.dep)],["Plazo",`${a.years} años (${s.n} meses)`],
+      ["Instrumento",it.n],["Tasa anual (antes de impuestos)",pct(a.rate)],["Inflación anual",pct(a.infl)],
+      ["Retención ISR",`${pct(a.isr)} anual sobre el saldo arriba de ${mxn(a.exempt)}`],
+      ["Tope de rendimiento",a.cap?`Sí: ${mxn(a.cap)} (el excedente no genera intereses)`:"No aplicado"],
+    ],{columnStyles:{0:{fontStyle:"bold",cellWidth:190}}});
+
+    h2("Resultado al final del plazo");
+    table(["Concepto","Monto"],[
+      ["Saldo final después de ISR",mxn(s.bal)],["Valor en pesos de hoy",mxn(s.real)],["Total depositado",mxn(s.contrib)],
+      ["Intereses ganados (antes de impuestos)",mxn(s.interest)],["Retención de ISR",mxn(-s.tax)],
+      ["Pérdida por inflación",mxn(-s.erosion)],["Ganancia real",mxn(realGain)],["Tasa real anual",pct(realRate(a.rate,a.infl))],
+      ["Saldo final sin retención de ISR",mxn(gross.bal)],
+      ["Se alcanza el tope de $500,000",s.cross?`${monthLabel(s.cross)} (año ${Math.ceil(s.cross/12)}, mes ${s.cross})`:"No se alcanza"],
+    ],{columnStyles:{0:{fontStyle:"bold",cellWidth:260},1:{halign:"right"}}});
+
+    h2("Crecimiento año por año",Math.min(300,CW*imgs.growth.ratio)+70); // keep heading with its chart
+    para("Barras: lo depositado y los intereses acumulados después de ISR. Línea: el valor en pesos de hoy.",9);
+    image(imgs.growth,300);
+
+    h2("Escenarios de tasa");
+    table(["Escenario","Tasa promedio","Saldo final","En pesos de hoy"],
+      sc.map(x=>[x.l,pct(x.r),mxn(x.s.bal),mxn(x.s.real)]),{columnStyles:{1:{halign:"right"},2:{halign:"right"},3:{halign:"right"}}});
+
+    h2("Estrategias para este plan");
+    table(["Estrategia","Descripción","Saldo final","En pesos de hoy","Riesgo"],
+      ST.map(x=>[`${x.t}\n(${x.tag})`,x.d,mxn(x.s.bal),mxn(x.s.real),x.risk]),
+      {columnStyles:{0:{fontStyle:"bold",cellWidth:110},2:{halign:"right"},3:{halign:"right"}}});
+
+    h2("Comparativo de instrumentos",160); // avoid an orphaned table header
+    para("Tasas anunciadas = lo que la institución promete hoy. Rendimiento 1 año (*) = lo que un fondo ganó en el pasado, no garantizado. Calificaciones con † son estimadas.",9);
+    table(["Instrumento","Tasa","Tipo","Tasa real","Saldo final","En pesos de hoy","Calificación","Riesgo","Protección"],
+      rows.map(x=>[x.n+(x.kind==="hist"?" *":"")+(x.n===it.n?" (elegido)":""),pct(x.r),x.kind==="hist"?"Rend. 1 año":"Anunciada",
+        pct(realRate(x.r,a.infl)),mxn(x.s.bal),mxn(x.s.real),x.risk.rating+(x.risk.est?" †":""),`${x.risk.score} · ${RISK_LBL[x.risk.score]}`,protLabel(x.prot)]),
+      {styles:{font:"helvetica",fontSize:8,cellPadding:3,textColor:INK,lineColor:[220,220,215],lineWidth:.5},
+       columnStyles:{0:{cellWidth:118},1:{halign:"right"},3:{halign:"right"},4:{halign:"right"},5:{halign:"right"}}});
+    image(imgs.inst,Math.max(320,Math.min(560,H-M-y-24))); // fill the rest of the page when there is room
+
+    h2("Resumen anual");
+    table(["Año","Depósitos","Intereses","Retención ISR","Pérdida inflación","Saldo al cierre","En pesos de hoy"],
+      s.yearly.map(v=>[`${v.year} (${START.getFullYear()+v.year})`,mxn(v.yC),mxn(v.yI),mxn(-v.yT),mxn(-v.yE),mxn(v.bal),mxn(v.real)])
+        .concat([["Total",mxn(s.contrib-a.P0),mxn(s.interest),mxn(-s.tax),mxn(-s.erosion),mxn(s.bal),mxn(s.real)]]),
+      {styles:{font:"helvetica",fontSize:8.5,cellPadding:3,halign:"right",textColor:INK,lineColor:[220,220,215],lineWidth:.5},
+       columnStyles:{0:{halign:"left"}},didParseCell:d=>{if(d.section==="body"&&d.row.index===s.yearly.length)d.cell.styles.fontStyle="bold";}});
+
+    h2("Cómo se calcula");
+    para("Cada mes: saldo nuevo = saldo x (1 + tasa/12) - retención ISR + depósito. Con tope, solo el saldo hasta el tope genera intereses. El valor en pesos de hoy divide entre (1 + inflación)^años.",9.5);
+
+    h2("Fuentes");
+    doc.setFontSize(9.5);
+    for(const [t,u] of SOURCES){need(26);doc.setFont("helvetica","bold");doc.setTextColor(...INK);doc.text(P(t),M,y+10);
+      doc.setFont("helvetica","normal");doc.setTextColor(...GREEN);doc.textWithLink(u.length>95?u.slice(0,92)+"...":u,M,y+22,{url:u});y+=30;}
+
+    const pages=doc.getNumberOfPages();
+    for(let i=1;i<=pages;i++){doc.setPage(i);doc.setFont("helvetica","normal");doc.setFontSize(8.5);doc.setTextColor(...GRAY);
+      doc.text(`Fondo de Ahorro · ${today}`,M,H-22);doc.text(`Página ${i} de ${pages}`,W-M,H-22,{align:"right"});}
+
+    window.__pdfPages=pages; // kept for automated checks
+    const res=await saveFile(`fondo-ahorro-reporte-${new Date().toISOString().slice(0,10)}.pdf`,doc.output("blob"));
+    st.textContent=res==="saved"?`Listo: reporte de ${pages} páginas descargado.`:SAVE_MSG[res];
+  }catch(e){
+    console.error(e); st.textContent="No se pudo generar el PDF. Revisa tu conexión a internet e inténtalo de nuevo.";
+  }finally{btn.disabled=false; btn.textContent=label;}
+}
+$("btnPdf").addEventListener("click",exportPDF);
+
+// ---------- Print: redraw charts in light colours at paper size, then restore the screen view ----------
+let printTheme=null;
+function beforePrint(){
+  if(printTheme!==null) return;
+  $("printDate").textContent=new Date().toLocaleDateString("es-MX",{day:"numeric",month:"long",year:"numeric"});
+  printTheme=document.documentElement.getAttribute("data-theme");
+  document.documentElement.setAttribute("data-theme","light");
+  NOANIM=true; render();
+  for(const ch of [gChart,iChart]){ch.resize();ch.update("none");ch.draw();}
+}
+function afterPrint(){
+  if(printTheme===null) return;
+  document.documentElement.setAttribute("data-theme",printTheme); printTheme=null;
+  NOANIM=false; render();
+}
+addEventListener("beforeprint",beforePrint);
+addEventListener("afterprint",afterPrint);
+matchMedia("print").addEventListener("change",e=>e.matches?beforePrint():afterPrint());
+$("btnPrint").addEventListener("click",()=>{beforePrint(); setTimeout(()=>window.print(),50);});
+// ---------- Excel export (ExcelJS, loaded on demand) ----------
+// The monthly schedule and the summary are real Excel formulas that point at the "Supuestos" sheet,
+// so changing an assumption in Excel recalculates everything. Cached results are included so the
+// numbers show immediately, even in viewers that don't recalculate.
+const XLSX_LIB="https://cdnjs.cloudflare.com/ajax/libs/exceljs/4.4.0/exceljs.min.js";
+function monthly(a){ // same engine as simulate(), but returns every month
+  const n=Math.round(a.years*12), mInf=Math.pow(1+a.infl,1/12)-1, rows=[]; let bal=a.P0;
+  for(let m=1;m<=n;m++){
+    const start=bal, earning=a.cap?Math.min(bal,a.cap):bal, i=earning*a.rate/12, t=Math.max(0,bal-a.exempt)*a.isr/12, e=bal*mInf;
+    bal=bal+i-t+a.dep;
+    const d=new Date(START); d.setMonth(d.getMonth()+m);
+    rows.push({m,year:Math.ceil(m/12),date:d,start,i,t,dep:a.dep,end:bal,e,real:bal/Math.pow(1+a.infl,m/12)});
+  }
+  return rows;
+}
+async function exportXLSX(){
+  const btn=$("btnXlsx"), st=$("pdfStatus"), label=btn.textContent;
+  btn.disabled=true; btn.textContent="Generando Excel…"; st.textContent="Preparando el archivo de Excel…";
+  try{
+    await loadScript(XLSX_LIB);
+    const {a,s,it,sc,ST,rows,realGain}=LAST, M=monthly(a), n=M.length, last=n+1;
+    const wb=new ExcelJS.Workbook(); wb.creator="Fondo de Ahorro"; wb.created=new Date();
+    const MONEY='"$"#,##0;[Red]-"$"#,##0', MONEY2='"$"#,##0.00;[Red]-"$"#,##0.00', PCT='0.00%';
+    const head=row=>{row.font={bold:true,color:{argb:"FFFFFFFF"}};row.fill={type:"pattern",pattern:"solid",fgColor:{argb:"FF0B5C4A"}};
+      row.alignment={vertical:"middle",wrapText:true};row.height=30;};
+    const title=(ws,t,sub)=>{ws.getCell("A1").value=t;ws.getCell("A1").font={bold:true,size:16,color:{argb:"FF0B5C4A"}};
+      if(sub){ws.getCell("A2").value=sub;ws.getCell("A2").font={italic:true,color:{argb:"FF555555"}};}};
+
+    // 1) Supuestos — the only cells meant to be edited (highlighted in yellow)
+    const S=wb.addWorksheet("Supuestos",{views:[{showGridLines:false}]});
+    title(S,"Fondo de Ahorro · Supuestos","Cambia las celdas amarillas: el calendario mensual y el resumen se recalculan solos.");
+    S.columns=[{width:38},{width:22},{width:62}];
+    const inputs=[
+      ["Inversión inicial",a.P0,MONEY,"Pesos al inicio del plan."],
+      ["Depósito mensual",a.dep,MONEY,"Se deposita al final de cada mes."],
+      ["Tasa anual (antes de impuestos)",a.rate,PCT,`Instrumento elegido: ${it.n}.`],
+      ["Plazo (años)",a.years,"0",`El calendario tiene ${n} meses; para otro plazo, vuelve a exportar desde la página.`],
+      ["Inflación anual",a.infl,PCT,"INEGI, 1a quincena de octubre de 2026."],
+      ["Retención ISR (anual sobre el saldo)",a.isr,PCT,"Ley de Ingresos 2026, art. 24."],
+      ["Saldo exento de retención",a.exempt,MONEY,"5 UMA anuales."],
+      ["Tope de rendimiento (0 = sin tope)",a.cap||0,MONEY,"Arriba del tope el saldo no genera intereses (Mifel: $500,000)."],
+      ["Fecha de inicio",START,"dd/mm/yyyy","Primer depósito un mes después."],
+    ];
+    S.getRow(4).values=["Supuesto","Valor","Nota"]; head(S.getRow(4));
+    inputs.forEach(([k,v,f,note],i)=>{const r=S.getRow(5+i); r.values=[k,v,note];
+      r.getCell(2).numFmt=f; r.getCell(2).fill={type:"pattern",pattern:"solid",fgColor:{argb:"FFFFF2CC"}};
+      r.getCell(2).font={bold:true}; r.getCell(3).font={color:{argb:"FF555555"}};});
+    const ref={P0:"Supuestos!$B$5",dep:"Supuestos!$B$6",rate:"Supuestos!$B$7",years:"Supuestos!$B$8",infl:"Supuestos!$B$9",
+      isr:"Supuestos!$B$10",exempt:"Supuestos!$B$11",cap:"Supuestos!$B$12",start:"Supuestos!$B$13"};
+
+    // 2) Calendario mensual — one row per month, all formulas
+    const C=wb.addWorksheet("Calendario mensual",{views:[{state:"frozen",ySplit:1}]});
+    C.columns=[["Mes",7],["Año del plan",9],["Fecha",12],["Saldo inicial",16],["Intereses",14],["Retención ISR",14],
+      ["Depósito",13],["Saldo final",16],["Pérdida por inflación",15],["Saldo en pesos de hoy",17]].map(([h,w])=>({header:h,width:w}));
+    head(C.getRow(1));
+    M.forEach((x,k)=>{const r=k+2;
+      C.getRow(r).values=[
+        x.m,
+        {formula:`ROUNDUP(A${r}/12,0)`,result:x.year},
+        {formula:`EDATE(${ref.start},A${r})`,result:x.date},
+        k===0?{formula:ref.P0,result:x.start}:{formula:`H${r-1}`,result:x.start},
+        {formula:`IF(${ref.cap}>0,MIN(D${r},${ref.cap}),D${r})*${ref.rate}/12`,result:x.i},
+        {formula:`MAX(0,D${r}-${ref.exempt})*${ref.isr}/12`,result:x.t},
+        {formula:ref.dep,result:x.dep},
+        {formula:`D${r}+E${r}-F${r}+G${r}`,result:x.end},
+        {formula:`D${r}*((1+${ref.infl})^(1/12)-1)`,result:x.e},
+        {formula:`H${r}/(1+${ref.infl})^(A${r}/12)`,result:x.real},
+      ];
+      C.getCell(`C${r}`).numFmt="mmm yyyy";
+      ["D","E","F","G","H","I","J"].forEach(c=>C.getCell(`${c}${r}`).numFmt=MONEY2);
+    });
+
+    // 3) Resumen — totals and yearly table, all formulas over the calendar
+    const R=wb.addWorksheet("Resumen",{views:[{showGridLines:false}]});
+    title(R,"Fondo de Ahorro · Resultado",`${it.n} · generado el ${new Date().toLocaleDateString("es-MX")} desde https://asteri-nomadas.github.io/fondo-ahorro/`);
+    R.columns=[{width:36},{width:18},{width:16},{width:16},{width:18},{width:18},{width:18}];
+    const cal="'Calendario mensual'";
+    const kpis=[
+      ["Saldo final después de ISR",`INDEX(${cal}!H:H,${last})`,s.bal,MONEY],
+      ["Valor en pesos de hoy",`INDEX(${cal}!J:J,${last})`,s.real,MONEY],
+      ["Total depositado",`${ref.P0}+SUM(${cal}!G2:G${last})`,s.contrib,MONEY],
+      ["Intereses ganados (antes de impuestos)",`SUM(${cal}!E2:E${last})`,s.interest,MONEY],
+      ["Retención de ISR",`-SUM(${cal}!F2:F${last})`,-s.tax,MONEY],
+      ["Pérdida por inflación",`-SUM(${cal}!I2:I${last})`,-s.erosion,MONEY],
+      ["Ganancia real",`B8+B9+B10`,realGain,MONEY],
+      ["Tasa real anual",`(1+${ref.rate}/12)^12/(1+${ref.infl})-1`,realRate(a.rate,a.infl),PCT],
+      ["Mes en que el saldo pasa de $500,000",`IFERROR(MATCH(TRUE,INDEX(${cal}!H2:H${last}>500000,0),0),"No se alcanza")`,s.cross??"No se alcanza","0"],
+    ];
+    R.getRow(4).values=["Concepto","Monto"]; head(R.getRow(4));
+    kpis.forEach(([k,f,v,fmt],i)=>{const r=R.getRow(5+i); r.getCell(1).value=k; r.getCell(2).value={formula:f,result:v}; r.getCell(2).numFmt=fmt;});
+    R.getCell("B5").font={bold:true,color:{argb:"FF0B5C4A"}};
+    const y0=16; R.getRow(y0-1).getCell(1).value="Resumen anual"; R.getRow(y0-1).font={bold:true,size:13};
+    R.getRow(y0).values=["Año del plan","Depósitos","Intereses","Retención ISR","Pérdida por inflación","Saldo al cierre","En pesos de hoy"]; head(R.getRow(y0));
+    s.yearly.forEach((v,k)=>{const r=y0+1+k, yr=v.year, endRow=Math.min(yr*12,n)+1;
+      R.getRow(r).values=[yr,
+        {formula:`SUMIFS(${cal}!G:G,${cal}!B:B,A${r})`,result:v.yC},
+        {formula:`SUMIFS(${cal}!E:E,${cal}!B:B,A${r})`,result:v.yI},
+        {formula:`-SUMIFS(${cal}!F:F,${cal}!B:B,A${r})`,result:-v.yT},
+        {formula:`-SUMIFS(${cal}!I:I,${cal}!B:B,A${r})`,result:-v.yE},
+        {formula:`INDEX(${cal}!H:H,${endRow})`,result:v.bal},
+        {formula:`INDEX(${cal}!J:J,${endRow})`,result:v.real}];
+      for(let c=2;c<=7;c++) R.getRow(r).getCell(c).numFmt=MONEY;});
+
+    // 4) Escenarios y estrategias — values computed by the page for the current inputs
+    const E=wb.addWorksheet("Escenarios y estrategias",{views:[{showGridLines:false}]});
+    title(E,"Escenarios y estrategias","Valores calculados por la página con los supuestos actuales.");
+    E.columns=[{width:30},{width:58},{width:14},{width:18},{width:18},{width:16}];
+    E.getRow(4).values=["Escenario de tasa","","Tasa","Saldo final","En pesos de hoy"]; head(E.getRow(4));
+    sc.forEach((x,k)=>{const r=E.getRow(5+k); r.values=[x.l,"",x.r,x.s.bal,x.s.real]; r.getCell(3).numFmt=PCT; r.getCell(4).numFmt=MONEY; r.getCell(5).numFmt=MONEY;});
+    E.getRow(10).values=["Estrategia","Descripción","","Saldo final","En pesos de hoy","Riesgo"]; head(E.getRow(10));
+    ST.forEach((x,k)=>{const r=E.getRow(11+k); r.values=[`${x.t} (${x.tag})`,x.d,"",x.s.bal,x.s.real,x.risk];
+      r.getCell(4).numFmt=MONEY; r.getCell(5).numFmt=MONEY; r.alignment={wrapText:true,vertical:"top"};});
+
+    // 5) Instrumentos
+    const I=wb.addWorksheet("Instrumentos",{views:[{state:"frozen",ySplit:1}]});
+    I.columns=[["Instrumento",30],["Categoría",30],["Tasa",9],["Tipo de tasa",18],["Tasa real",10],["Saldo final",15],["En pesos de hoy",15],
+      ["Calificación",12],["¿Estimada?",10],["Riesgo (1-5)",10],["Nivel de riesgo",13],["Protección",16],["Requisito",22],["Por qué",70],["Sitio oficial",34],["Genera rendimiento hasta",40],["Protección hasta",34]]
+      .map(([h,w])=>({header:h,width:w}));
+    head(I.getRow(1));
+    rows.forEach(x=>{const r=I.addRow([x.n+(x.n===it.n?" (elegido)":""),x.cat,x.r,x.kind==="hist"?"Rendimiento 1 año (jun-2026)":"Anunciada",
+      realRate(x.r,a.infl),x.s.bal,x.s.real,x.risk.rating,x.risk.est?"Sí":"No",x.risk.score,RISK_LBL[x.risk.score],protLabel(x.prot),
+      x.req??(x.cap?"Tope "+mxn(x.cap):""),x.risk.why,(o=>o?{text:o[1],hyperlink:o[0]}:"")(officialOf(x))]);
+      if(officialOf(x)) r.getCell(15).font={color:{argb:"FF0B5C4A"},underline:true};
+      r.getCell(16).value=limitOf(x).txt; r.getCell(17).value=coverTxt(x);
+      r.getCell(3).numFmt=PCT;r.getCell(5).numFmt=PCT;r.getCell(6).numFmt=MONEY;r.getCell(7).numFmt=MONEY;r.alignment={vertical:"top",wrapText:true};});
+
+    // 6) Fuentes
+    const F=wb.addWorksheet("Fuentes",{views:[{showGridLines:false}]});
+    title(F,"Fuentes","Resumen informativo, no es una recomendación de un asesor financiero.");
+    F.columns=[{width:48},{width:100}];
+    F.getRow(4).values=["Dato","Enlace"]; head(F.getRow(4));
+    SOURCES.forEach(([t,u],k)=>{const r=F.getRow(5+k); r.getCell(1).value=t; r.getCell(2).value={text:u,hyperlink:u}; r.getCell(2).font={color:{argb:"FF0B5C4A"},underline:true};});
+
+    wb.views=[{activeTab:2}]; // open on "Resumen"
+    const buf=await wb.xlsx.writeBuffer();
+    const blob=new Blob([buf],{type:"application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"});
+    window.__xlsxBlob=blob; // kept for automated checks
+    const res=await saveFile(`fondo-ahorro-calculos-${new Date().toISOString().slice(0,10)}.xlsx`,blob);
+    st.textContent=res==="saved"?"Listo: archivo de Excel descargado (6 hojas, con fórmulas).":SAVE_MSG[res];
+  }catch(e){
+    console.error(e); st.textContent="No se pudo generar el Excel. Revisa tu conexión a internet e inténtalo de nuevo.";
+  }finally{btn.disabled=false; btn.textContent=label;}
+}
+$("btnXlsx").addEventListener("click",exportXLSX);
+$("printDate").textContent=new Date().toLocaleDateString("es-MX",{day:"numeric",month:"long",year:"numeric"});
+
+TABLE_TOOLS.instTbl={search:true,filters:[
+  {key:"prot",label:"Protección",options:[["IPAB","IPAB"],["PROSOFIPO","PROSOFIPO"],["GOBIERNO","Gobierno federal"],["FONDO","Fondo de inversión"],["NINGUNA","Sin seguro"]]},
+  {key:"kind",label:"Tipo de tasa",options:[["anunciada","Anunciada"],["hist","Rendimiento pasado"]]}]};
+TABLE_TOOLS.yearTbl={};
+TABLE_TOOLS.protTbl={};
+["instTbl","yearTbl","protTbl"].forEach(id=>buildTools($(id)));
+labelStack($("protTbl")); refreshTable($("protTbl"));
+// Re-draw charts when crossing the phone breakpoint or rotating the device
+{let t; addEventListener("resize",()=>{clearTimeout(t);t=setTimeout(render,200);});}
+$("dockToggle").addEventListener("click",()=>{
+  const open=!$("dock").classList.contains("open");
+  $("dock").classList.toggle("open",open); $("dockToggle").setAttribute("aria-expanded",open);
+});
+document.addEventListener("keydown",e=>{if(e.key==="Escape"&&$("dock").classList.contains("open")){$("dock").classList.remove("open");$("dockToggle").setAttribute("aria-expanded","false");$("dockToggle").focus();}});
+$("fsDown").addEventListener("click",()=>{if(fi>0){fi--;applyFont();}});
+$("fsUp").addEventListener("click",()=>{if(fi<STEPS.length-1){fi++;applyFont();}});
+// ---------- colour palette + theme ----------
+const mq=matchMedia("(prefers-color-scheme: dark)");
+const store={get:k=>{try{return localStorage.getItem(k);}catch(e){return null;}},set:(k,v)=>{try{localStorage.setItem(k,v);}catch(e){}}};
+function applyLook(){
+  const pal=$("selPal").value, th=$("selTheme").value;
+  const resolved=th==="auto"?(mq.matches?"dark":"light"):th;
+  document.documentElement.setAttribute("data-theme",resolved);
+  if(pal==="okabe") document.documentElement.removeAttribute("data-palette"); else document.documentElement.setAttribute("data-palette",pal);
+  store.set("fondo-palette-v2",pal); store.set("fondo-theme-v2",th);
+  render();
+}
+// Defaults: Clásico + Claro. New storage keys so earlier saved choices don't override the new defaults.
+$("selPal").value=["okabe","contraste","clasico","calido"].includes(store.get("fondo-palette-v2"))?store.get("fondo-palette-v2"):"clasico";
+$("selTheme").value=["auto","light","dark"].includes(store.get("fondo-theme-v2"))?store.get("fondo-theme-v2"):"light";
+$("selPal").addEventListener("change",applyLook);
+$("selTheme").addEventListener("change",applyLook);
+mq.addEventListener("change",()=>{if($("selTheme").value==="auto")applyLook();});
+{const th=$("selTheme").value, pal=$("selPal").value;
+ document.documentElement.setAttribute("data-theme",th==="auto"?(mq.matches?"dark":"light"):th);
+ if(pal!=="okabe") document.documentElement.setAttribute("data-palette",pal); else document.documentElement.removeAttribute("data-palette");}
+applyFont();
+// Compact result bar: shown only while the hero indicators are above the viewport (scrolled past),
+// hidden again when they come back into view. Clicking it returns to the full indicators.
+if("IntersectionObserver" in window){
+  const bar=$("kpiBar");
+  new IntersectionObserver(([e])=>bar.classList.toggle("show",!e.isIntersecting&&e.boundingClientRect.bottom<0)).observe($("kpis"));
+  bar.addEventListener("click",()=>document.querySelector(".hero-result").scrollIntoView({block:"start",
+    behavior:matchMedia("(prefers-reduced-motion: reduce)").matches?"auto":"smooth"}));
+}
+</script>
+</body>
+</html>
