@@ -20,6 +20,7 @@ Toda la página está en `index.html`. Carga Chart.js y la fuente Inter desde CD
 - Al bajar más allá de los indicadores, aparece fija arriba una barra compacta con los mismos números, que se actualiza al cambiar cualquier supuesto:
   - muestra los seis indicadores en pantallas anchas, y menos (empezando por el saldo final) en pantallas angostas o con el texto agrandado, para que ningún número se corte;
   - al hacer clic en ella se vuelve al resultado completo;
+  - al bajar también más allá de los supuestos, se agrega debajo una segunda fila con los supuestos actuales (depósito mensual, inversión inicial, instrumento con su tasa y tope, plazo, inflación e ISR); al hacer clic en ella se vuelve a los campos para cambiarlos. En pantallas angostas esa fila se desliza de lado;
   - desaparece al regresar arriba y no se imprime.
 - Proyección mes a mes del plan: $100,000 iniciales y $10,000 mensuales durante 10 años. Todos los supuestos se pueden editar.
 - Los campos en pesos muestran separadores de miles (100,000) al escribir.
@@ -97,7 +98,7 @@ Toda la página está en `index.html`. Carga Chart.js y la fuente Inter desde CD
   - selector de colores: Clásico (predeterminado), aptos para daltonismo, Alto contraste o Cálido;
   - selector de tema: Claro (predeterminado), Automático u Oscuro.
 - Efectos al pasar el cursor sobre enlaces, botones y campos.
-- La barra compacta del resultado es solo visual: los lectores de pantalla leen los indicadores una vez, en el bloque inicial. Los enlaces a cada sección dejan el título visible debajo de la barra.
+- La barra compacta del resultado y los supuestos es solo visual: los lectores de pantalla leen esa información una vez, en el bloque inicial y en los campos. Los enlaces a cada sección dejan el título visible debajo de la barra.
 - Sin animaciones si el sistema pide reducir el movimiento.
 
 ### Celular

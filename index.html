@@ -126,9 +126,24 @@ p{text-wrap:pretty;margin:.4rem 0 0}
 @container (min-width:17rem){.kpi-bar dl{grid-template-columns:repeat(2,minmax(0,1fr))} .kpi-bar dl > div:nth-child(2){display:block} .kpi-bar dd{font-size:min(1.2rem,6.2cqi)}}
 @container (min-width:34rem){.kpi-bar dl{grid-template-columns:repeat(3,minmax(0,1fr))} .kpi-bar dl > div:nth-child(3){display:block} .kpi-bar dd{font-size:min(1.2rem,4.1cqi)}}
 @container (min-width:56rem){.kpi-bar dl{grid-template-columns:repeat(6,minmax(0,1fr))} .kpi-bar dl > div:nth-child(n){display:block} .kpi-bar dd{font-size:min(1.2rem,2.1cqi)}}
-@media (prefers-reduced-motion: reduce){.kpi-bar,.kpi-bar.show{transition:none}}
-/* Headings reached by a link land below the bar instead of under it */
-[id^="h-"]{scroll-margin-top:6rem}
+.kpi-bar-in,.kpi-params-in{cursor:pointer}
+/* Assumptions row: opens (0fr → 1fr) only after the inputs block is scrolled past */
+.kpi-params{display:grid;grid-template-rows:0fr;transition:grid-template-rows .25s ease}
+.kpi-bar.params .kpi-params{grid-template-rows:1fr}
+.kpi-params-clip{min-height:0;overflow:hidden;background:var(--well);container-type:inline-size}
+.kpi-params-in{max-width:72rem;margin:0 auto;padding:.45rem 1rem .5rem;display:flex;align-items:center;gap:.6rem;
+  overflow-x:auto;scrollbar-width:thin;-webkit-overflow-scrolling:touch}
+@media (min-width:640px){.kpi-params-in{padding-left:1.5rem;padding-right:1.5rem}}
+.kp-edit{flex:none;font-size:.8rem;font-weight:700;color:var(--accent);white-space:nowrap}
+#kpiParams{display:flex;flex-wrap:nowrap;gap:.35rem;margin:0;padding:0;list-style:none}
+#kpiParams li{flex:none;font-size:.85rem;line-height:1.4;padding:.15rem .55rem;border-radius:99px;white-space:nowrap;
+  color:var(--ink-2);background:var(--bg);box-shadow:inset 0 0 0 1px var(--line-strong)}
+#kpiParams li b{color:var(--ink);font-weight:700}
+/* Wide screens: chips wrap so all are visible; narrow ones keep one line that scrolls sideways */
+@container (min-width:56rem){#kpiParams{flex-wrap:wrap} .kpi-params-in{overflow-x:visible}}
+@media (prefers-reduced-motion: reduce){.kpi-bar,.kpi-bar.show,.kpi-params{transition:none}}
+/* Headings reached by a link land below the bar (results + assumptions) instead of under it */
+[id^="h-"]{scroll-margin-top:8rem}
 a.btn-primary{display:inline-flex;align-items:center;justify-content:center;gap:.4rem;text-decoration:none}
 section{padding-top:2.5rem;margin-top:2.5rem;border-top:1px solid var(--line)}
 section > header{margin-bottom:1.25rem}
@@ -417,7 +432,12 @@ footer{margin-top:3rem;padding-top:1.5rem;border-top:1px solid var(--line);color
 <a href="#main" class="sr-only">Ir al contenido</a>
 <!-- Compact copy of the result indicators, pinned to the top once the hero's indicators scroll out of view.
      Visual aid only (aria-hidden): screen readers already get the full indicators in the hero. -->
-<div class="kpi-bar" id="kpiBar" aria-hidden="true" title="Volver al resultado"><div class="kpi-bar-in"><dl id="kpiBarList"></dl></div></div>
+<div class="kpi-bar" id="kpiBar" aria-hidden="true">
+  <div class="kpi-bar-in" title="Volver al resultado"><dl id="kpiBarList"></dl></div>
+  <!-- Second row: the assumptions behind those numbers, added once the inputs block scrolls out of view -->
+  <div class="kpi-params"><div class="kpi-params-clip"><div class="kpi-params-in" title="Cambiar los supuestos">
+    <span class="kp-edit">✎ Supuestos</span><ul id="kpiParams"></ul></div></div></div>
+</div>
 <div class="wrap" id="main">
 
 <header>
@@ -840,6 +860,10 @@ function render(){
   const KB=[["hero","Saldo final",mxn(s.bal)],["","En pesos de hoy",mxn(s.real)],["","Depositado",mxn(s.contrib)],
     ["","Intereses",mxn(s.interest)],["","Retención ISR",mxn(-s.tax)],["","Ganancia real",mxn(realGain)]];
   $("kpiBarList").innerHTML=KB.map(([c,l,v])=>`<div class="${c}"><dt>${l}</dt><dd>${v}</dd></div>`).join("");
+  // The assumptions behind those numbers, for the bar's second row (most decisive first: they show first on phones)
+  const KP=[["Mensual",mxn(a.dep)],["Inicial",mxn(a.P0)],[it.n,pct(a.rate)+(a.cap?" hasta "+mxn(a.cap):"")],["",`${a.years} años`],
+    ["Inflación",pct(a.infl)],["ISR",`${pct(a.isr)} arriba de ${mxn(a.exempt)}`]];
+  $("kpiParams").innerHTML=KP.map(([l,v])=>`<li>${l?l+" ":""}<b>${v}</b></li>`).join("");
 
   // composition
   const cP=s.contrib/s.bal*100, iP=Math.max(0,100-cP);
@@ -1508,13 +1532,21 @@ mq.addEventListener("change",()=>{if($("selTheme").value==="auto")applyLook();})
  document.documentElement.setAttribute("data-theme",th==="auto"?(mq.matches?"dark":"light"):th);
  if(pal!=="okabe") document.documentElement.setAttribute("data-palette",pal); else document.documentElement.removeAttribute("data-palette");}
 applyFont();
-// Compact result bar: shown only while the hero indicators are above the viewport (scrolled past),
-// hidden again when they come back into view. Clicking it returns to the full indicators.
-if("IntersectionObserver" in window){
-  const bar=$("kpiBar");
-  new IntersectionObserver(([e])=>bar.classList.toggle("show",!e.isIntersecting&&e.boundingClientRect.bottom<0)).observe($("kpis"));
-  bar.addEventListener("click",()=>document.querySelector(".hero-result").scrollIntoView({block:"start",
-    behavior:matchMedia("(prefers-reduced-motion: reduce)").matches?"auto":"smooth"}));
+// Compact top bar: the results row shows once the hero indicators are above the viewport, and the
+// assumptions row is added once the inputs block is too. Checked on scroll (once per frame) rather than
+// with IntersectionObserver, which misses jumps (End key, links) that skip an element without it ever
+// crossing the screen. Clicking a row returns to the full indicators or to the inputs.
+{
+  const bar=$("kpiBar"), kpis=$("kpis"), well=document.querySelector("section[aria-labelledby='h-inputs'] .well");
+  let queued=false;
+  const update=()=>{queued=false;
+    bar.classList.toggle("show",kpis.getBoundingClientRect().bottom<0);
+    bar.classList.toggle("params",well.getBoundingClientRect().bottom<0);};
+  const queue=()=>{if(!queued){queued=true;requestAnimationFrame(update);}};
+  addEventListener("scroll",queue,{passive:true}); addEventListener("resize",queue); update();
+  const go=el=>el.scrollIntoView({block:"start",behavior:matchMedia("(prefers-reduced-motion: reduce)").matches?"auto":"smooth"});
+  bar.querySelector(".kpi-bar-in").addEventListener("click",()=>go(document.querySelector(".hero-result")));
+  bar.querySelector(".kpi-params-in").addEventListener("click",()=>go($("h-inputs")));
 }
 </script>
 </body>
