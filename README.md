@@ -28,7 +28,7 @@ Toda la página está en `index.html`. Carga Chart.js y la fuente Inter desde CD
 - El texto de introducción y la nota del tope cambian según los supuestos y el instrumento elegido.
 - Escenarios de tasa (bajo, base y alto).
 - Cuatro estrategias completas:
-  - solo Mifel;
+  - tu plan actual: el instrumento, la tasa y el tope que elijas, con su riesgo (cambia con los supuestos);
   - Mifel + un segundo banco con IPAB;
   - Mifel + CETES;
   - todo en CETES.

@@ -879,8 +879,12 @@ function render(){
   $("scen").innerHTML=sc.map(x=>`<div class="${x.l==="Base"?"base":""}"><h3>Escenario ${x.l.toLowerCase()} · ${pct(x.r)}</h3><span class="v">${mxn(x.s.bal)}</span><span class="muted">${mxn(x.s.real)} en pesos de hoy</span></div>`).join("");
 
   // strategies
+  // "Plan actual" mirrors the inputs (instrument, rate, cap): same simulation as the results at the top
+  const pr=riskOf(it,s.bal);
+  const planD=(a.cap?`Arriba de ${mxn(a.cap)} el dinero deja de generar intereses`+(s.cross?`; con este plan se llega al tope en ${monthLabel(s.cross)}.`:"; con este plan no se llega al tope.")
+                    :`Todo el saldo genera rendimiento al ${pct(a.rate)}.`)+(it.kind==="hist"?" Es un rendimiento pasado, no garantizado.":"");
   const ST=[
-    {t:"Solo Mifel (con tope)",tag:"Plan actual",d:"Arriba de $500,000 el dinero deja de generar intereses.",s:simulate({...a,rate:.10,cap:500000}),risk:"1 · Muy bajo"},
+    {t:`Solo ${it.n} (${pct(a.rate)}${a.cap?", con tope":""})`,tag:"Plan actual",d:planD,s,risk:`${pr.score} · ${RISK_LBL[pr.score]}`},
     {t:"Mifel + Now bank (7.5%)",tag:"Mejor equilibrio",d:"Hasta $500,000 en Mifel; el excedente en un segundo banco con IPAB.",s:simulate({...a,rate:.10,cap:500000,spill:.075}),risk:"1 · Muy bajo",best:true},
     {t:"Mifel + CETES (6.25%)",tag:"Muy seguro",d:"Hasta $500,000 en Mifel; el excedente en CETES del Gobierno federal.",s:simulate({...a,rate:.10,cap:500000,spill:.0625}),risk:"1 · Muy bajo"},
     {t:"Todo en CETES (6.25%)",tag:"Lo más seguro",d:"Sin límites de garantía; tasa más baja y puede cambiar en cada subasta.",s:simulate({...a,rate:.0625,cap:null}),risk:"1 · Muy bajo"},
